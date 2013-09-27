@@ -1,0 +1,58 @@
+		examples.htx
+		Copyright  1989, John W. Small, All rights reserved
+		PSW / Power SoftWare, P.O. Box 10072
+		McLean, Virginia 22102 8072
+		(703) 759-3838
+		7/27/89
+
+examples
+
+
+
+		The following examples will help give you a greater appreciation
+		for the power of FlexList to reduce code sizes and development
+		times as well as defining a hybrid stack-queue-list-array generic
+		data structure at run time.
+
+
+			viewview		dumpdump
+
+view
+
+
+
+		The view program reads an ascii file while building a FlexList
+		of file positions of page and subpage boundaries.  As a file is
+		viewed the FlexList nodes are accessed to determine the file
+		position to seek.  Then that portion of the file is read and
+		displayed on the screen.  This saves the file from having to be
+		stored in RAM.
+
+		The major functions of view.c are shown below.
+
+			loadpgs()|view view.c 48		Read ascii file while building a FlexList
+							of file positions of page and subpage
+							boundaries.
+
+			putpgs()|view view.c 129		This is the program's main control loop.
+dump
+
+
+
+		The dump program reads any file into a FlexList with each node
+		comprising 256 byte chunks of the file.  As the file is viewed
+		the FlexList nodes are accessed to retreive that portion of the
+		file.
+
+		The major functions of dump.c are shown below.
+
+			loaddf()|view dump.c 36		Read file into a FlexList with each node
+							comprising 256 byte chunks of the file.
+
+			dump()|view dump.c 103			This is the program's main control loop.
+
+
+
+		dump examples.htx|dump examples.htx
+
+

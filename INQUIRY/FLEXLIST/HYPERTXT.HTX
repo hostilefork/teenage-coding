@@ -1,0 +1,226 @@
+		hypertxt.htx
+		Copyright  1989, John W. Small, All rights reserved
+		PSW / Power SoftWare, P.O. Box 10072
+		McLean, Virginia 22102 8072
+		(703) 759-3838
+		7/27/89
+
+help
+		Copyright  1989, John W. Small, All rights reserved
+
+
+		A hypertext file is a text file partitioned into topics.topics
+
+		Topics can have more than one page.pages
+
+		A page may have highlighted text areas which are called
+		hyperlinkshlinks.  Hyperlinks are references to other topics.
+		Use the cursor movement keys to move between hyperlinks.
+
+		Press <Enter> to select the topic associated with a hyperlink.
+		Press <Backspace> to return to the previous topic.
+		Press <ESC> to return directly to the root topic.
+		Press <ESC> again to exit program.
+		See also: keystoke summarykeys
+
+		The message linemessline appearing at the bottom of the screen
+		displays the name of the current topic and hypertext file
+		at the left as well as the topic referenced by the current
+		hyperlink, if any, towards the right.
+topics
+
+
+
+		A topic is any group of text that constitutes an idea.
+
+		A hyperlinkhlinks embedded in the text of a topic links that
+		topic to another topic.  With many hyperlinks a single
+		topic could be feasibly linked to many topics.
+
+		A topic may comprise several pages.pages
+
+		The name of the current topic is displayed at the start
+		of the message linemessline followed immediately by a "|" and
+		the name of the hypertext file.
+
+		See also: hypertext file formathtformat
+
+
+
+
+		It is possible to move sequentially through the topics
+		of a hypertext file even though they may not be "hyperlinked."
+		Use <Ctrl Page Up> and <Ctrl Page Down> to move between
+		adjacent topics and <Ctrl Home> and <Ctrl End> to move to
+		the first and last topics of a hypertext file respectively.
+
+		Use <Alt F3> to specify a topic by name.  Topic names are case
+		sensitive, which means upper and lower case letters must match
+		exactly in order to find the topic.
+
+		Use <F3> to specify another hypertext file.
+
+		See also: keystoke summarykeys
+
+pages
+
+
+
+
+		If a hypertext topic has more than one page the "PgUp/PgDn"
+		message will appear on the message line at the bottom of
+		the screen.
+
+
+		Use the <Page Down> key now to move to the second page
+		of this topic which is "pages."
+
+
+		<Backspace> will return you to the previous topic.
+
+
+		See also: keystoke summarykeys
+
+
+
+
+
+		Congratulations, you have arrived - that is at the second
+		page of the topic "pages."
+
+
+		<Page Up> will take you back to the first page of the
+		topic "pages."
+
+
+		Note that <Backspace> will return you to the previous topic
+		and not back to the first page of this topic!
+
+
+hlinks
+
+
+
+		Hyperlinks are keyword phrases embedded in the text of a
+		topic.topics  This allows a topic to reference other topics
+		which expound on the keyword idea.   In a way, this is
+		like embedding the index of a book right into the text.
+
+		A hyperlink can link to a topic in another hypertext file.
+		This allows hypertext files to be interrelated.
+
+		A hyperlink may even link to an executable file or system
+		command!
+
+		The message linemessline reveals the associated "hyperlinked"
+		topic and/or file.
+
+		See also: hypertext file formathtformat
+
+messline
+
+
+
+		The message line appearing at the bottom of the screen
+		displays the current hypertext topic followed by a "|"
+		and a hypertext file name which in the case of this topic
+		is "messline|hypertxt.htx."  If this program were started
+		with a path name that path name will appear prefixed to
+		"hypertxt.htx."
+
+		The current hyperlinkhlinks, if any, is shown to the right.
+		If the hyperlink links to a topictopics in the current
+		hypertext file, only the topic is shown.  Otherwise the
+		topic is followed by a "|" and the name of the auxilary
+		hypertext file.
+
+		If the link is to an executable file, the topic portion
+		will be missing with only the "|" and the name of the
+		executable file appearing.
+
+		See also: hypertext file formathtformat
+
+keys
+
+		<Enter>				select topic associated with current hyperlink
+
+		<BackSpace> 		return to previous topic
+
+		<ESC>				return to root topic or exit
+
+		Cursor keys &
+		Home/End			move between hyperlinks
+
+		<Page Up>/
+		<Page Down>			move between pages of a topic
+
+		<Ctrl PgUp>/
+		<Ctrl PgDn>/
+		<Ctrl Home>/
+		<Ctrl End>			move between topics
+
+		<F1>				hypertext help
+
+		<F3>				load new hypertext file
+
+		<Alt F3>			specify new topic
+htformat
+
+
+		When viewing a hypertext file with a word processor the
+		topic and hyperlink formating characters become visible.
+
+
+		A topictopics is defined on a line by itself begining in column
+		one with a vertical tab character, <Ctrl K>, i.e.
+
+		^Ktopic
+
+		The topic continues on until the next topic or a <Ctrl X>
+		in column one or the end of the file is reached.
+
+		A topic can comprise multiple pagespages by having a line
+		containing only a vertical tab in column one to indicate
+		the page break, i.e.
+
+		^K
+
+		It's up to the hypertext file to provide formating for
+		pages and lines.
+
+
+
+
+		A hyperlinkhlinks appears as follows:
+
+			^E text  ^Ktopic^X
+
+		<Ctrl E> introduces a hyperlink and <Ctrl X> ends it.
+		The <Ctrl K> separates the visible text from the name
+		of the "hyperlinked" topic.
+
+
+		If the topic resides in an auxilary hypertext file a "|"
+		followed by a file name is appended to topic, i.e.
+
+			^E text   ^Ktopic|filename^X
+
+
+		If the topic is missing than the file is executed as
+		a program:
+
+			^E text   ^K|filename^X
+
+
+
+
+
+		From what you have learned from this topic you should be
+		able to use your word processor to create hypertext files
+		that can be read by this program.
+
+		Start out by examining this help file with your word
+		processor, i.e.
+
+			View:	hypertxt.htx|view hypertxt.htx
+

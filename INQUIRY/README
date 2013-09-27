@@ -1,0 +1,32 @@
+This is some funny old C and Pascal code for a piece of educational
+software that I started writing when I was 17--for the Spanish
+Honor society as a senior in High School.  The following summer I
+added graphics to it, right before I started college.  It was
+applied for studying and review of physiology at the George
+Washington University Medical Center library.
+
+Blog entry about it:
+
+    http://hostilefork.com/2013/09/27/inquiry-more-teenage-turbo-c-coding/
+
+The four subdirectories are for the pieces of the project.  Two
+of them were written in C:
+
+    \INQG     - The graphical lecture/quiz "player" runtime
+    \INQE     - The text-mode quiz/lecture database editor
+
+ There were also some small pieces in Turbo Pascal.  I haven't
+ seen Pascal for so long I'm surprised by things like that comments
+ were in curly braces.  I only vaguely remember that being the case!
+
+    \INQM     - The "maker" that packages DB and player on a floppy
+    \INQI     - The "installer" program
+
+A zip of this code miraculously survived the various purges of 5 1/4"
+and 3 1/2" floppies in the intervening decades.  So I thought it
+would be interesting to look at (at least for me, probably no one
+else would care...!)
+
+Though I used Borland C++ and the file extensions ".CPP" and ".HPP",
+there's no C++ in it that jumps out at me.  It looks like plain
+old bug-prone C to my eyes now.  :-)

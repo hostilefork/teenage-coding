@@ -1,0 +1,169 @@
+		demo.htx
+		Copyright  1989, John W. Small, All rights reserved
+		PSW / Power SoftWare, P.O. Box 10072
+		McLean, Virginia 22102 8072
+		(703) 759-3838
+		7/27/89
+
+demo
+		Copyright  1989, John W. Small, All rights reserved
+
+
+		Press F1, Help, to learn how to use this hypertext Program.
+
+		This hypertext programhypertxt was written using FlexList.  It
+		utilizes lists of lists nested three levels deep and yet
+		was written without coding any linked lists.  In fact the
+		program was completed after three major redesigns all in
+		less than 1 1/2 man weeks.  This was possible because with
+		FlexList no linked list primitives had to be written or
+		rewritten in order to accommodate the redesigned data
+		structures.
+
+		See also:
+
+			FlexList Hypertext Manualmanual|flexlist.htx
+
+			other examplesexamples|examples.htx
+
+hypertxt
+
+
+		As you browse down a hyperlinkhlinks|hypertxt.htx path the hypertext program
+		builds a stack of previous topicstopics|hypertxt.htx tranversed.  Each topic on
+		this pending topic stacktopic stack is a list of hyperlinks appearing
+		in that pending topic.  When you return to a previous topic
+		using <Backspace>keys|hypertxt.htx the topic is popped and redisplayed.
+
+		A hyperlinks listhlinks list is built only when its associated topic
+		is first displayed.  Each hyperlink node in this list stores
+		the hyperlink's visible text, its invisible topic path, and
+		the hyperlink's screen position.  Thus this list allows the
+		cursor to be repositioned on the screen without rereading the
+		hypertext file to do so.  Remember, text from the hypertext
+		file is never stored in RAM.
+
+		A hypertext file is represented in RAM by a list of its topics.
+		A node in this list contains the name of the topic and its
+		position in the hypertext file.  Actually each pagepages|hypertxt.htx of a topic
+		has its own node in this list referred to as a hyperpages listhpages list.
+		Each hyperlinks list references a node in a hyperpages list.  A
+		hyperpages list can be reference by more than one hyperlinks list.
+
+		Here is the overall hypertext program's lists of lists structure:
+
+
+		topicstopic stack			FlistHeader	->  hls ->  hls ->  hls
+
+											|       |       |
+						  __________________|       v       v
+						 |
+						 |
+						 v
+
+		(hyperlinkshlinks list)    FlistHeader ->  hl  ->  hl  ->  hl
+						(hlinks_info|view hypertxt.c 188)		  (hlink|view hypertxt.c 183)
+						 |
+						 |
+					hps  |-----------------------|  hpNo
+						 |                       |
+						 v                       v
+
+		(hyperpageshpages list)    FlistHeader ->  hp  ->  hp  ->  hp
+						(hpages_info|view hypertxt.c 178)		  (hpage|view hypertxt.c 173)
+
+
+
+		The major functions of hypertxt.c are shown below.
+
+
+			loadhps()|view hypertxt.c 211		Loads hypertext file into a FlexList
+							of hyperpages.
+
+			puthp()|view hypertxt.c 382			Displays current hyperpage and builds
+							a FlexList of the hyperlinks displayed
+							if the address of a Flist variable is
+							passed.
+
+			puthps()|view hypertxt.c 732		This is the program's main control loop.
+							The topic stack is a local variable of
+							this function.
+
+		Other interesting functions are shown below.
+
+			strvec()|view hypertxt.c 334		Convert a string of tokens to an array of
+							character pointers.
+topic stack
+
+	  --------------
+	  !  topics    !  (FlistFlist|flexlist.htx)			STACK OF PENDING TOPICS
+	  --------------
+			!            !--!
+			!            ! _!_
+			!            ! \!/              (FlistNodeFlistNode|flexlist.htx)
+		   \!/           !  `
+      ----------------   !      --------      --------      --------
+	  ! front        ! --!----> ! next ! ---> ! next ! ---> ! next ! ----!
+	  !--------------!   !      !------!      !------!      !------!     !
+	  ! current      ! --!  !-- ! prev ! <--- ! prev ! <--- ! prev !     !
+	  !--------------!      !   !------!      !------!      !------!    _!_
+	  ! rear         ! --!  !   ! hlshlinks list  !      ! hls  !      ! hls  !    \!/
+	  !--------------!   ! _!_  --------      --------      --------     `
+	  ! ncurrent   0 !   ! \!/           			   ,
+	  !--------------!   !  `                                 /!\
+	  ! nodes      3 !   !                                     !
+	  !--------------!   !_____________________________________!
+	  ! ndlen      * !
+      !--------------!
+      ! hdlen      0 !	(FlistHeaderFlistHeader|flexlist.htx)      * depends on data model
+	  ----------------
+
+hlinks list
+	  --------------
+	  !  hls       !  (FlistFlist|flexlist.htx)			LIST OF HYPERLINKS
+	  --------------
+            !            _________________________
+			!            !                       !          (FlistNodeFlistNode|flexlist.htx)
+           \!/           !                      \!/
+      ----------------   !      --------      --------      --------
+      ! front        ! --!----> ! next ! ---> ! next ! ---> ! next ! ---!
+      !--------------!   !      !------!      !------!      !------!    !
+      ! current      ! --!  !-- ! prev ! <--- ! prev ! <--- ! prev !    !
+      !--------------!      !   !------!      !------!      !------!   _!_
+	  ! rear         ! --!  !   ! txt  !      ! txt  !      ! txt  !   \!/
+	  !--------------!   ! _!_  ! topic!      ! topic!      ! topic!    `
+	  ! ncurrent   2 !   ! \!/  ! scrX !      ! scrX !      ! scrX !
+	  !--------------!   !  `   ! scrY !      ! scrY !      ! scrY !
+	  ! nodes      3 !   !      --------      --------      --------
+	  !--------------!   !      (hlink|view hypertxt.c 183)                              /!\
+	  ! ndlen      * !   !_____________________________________!
+      !--------------!
+	  ! hdlen      * !   (FlistHeaderFlistHeader|flexlist.htx)		* depends on data model
+      !--------------!
+	  ! hpshpages list, hpNo    !  (hlinks_info|view hypertxt.c 188)
+	  ----------------
+hpages list
+	  --------------
+	  !  hps       !  (FlistFlist|flexlist.htx)			LIST OF HYPERPAGES
+	  --------------
+            !            _________________________
+			!            !                       !          (FlistNodeFlistNode|flexlist.htx)
+           \!/           !                      \!/
+      ----------------   !      --------      --------      --------
+      ! front        ! --!----> ! next ! ---> ! next ! ---> ! next ! ---!
+      !--------------!   !      !------!      !------!      !------!    !
+      ! current      ! --!  !-- ! prev ! <--- ! prev ! <--- ! prev !    !
+      !--------------!      !   !------!      !------!      !------!   _!_
+	  ! rear         ! --!  !   ! topic!      ! topic!      ! topic!   \!/
+	  !--------------!   ! _!_  ! fpos !      ! fpos !      ! fpos !    `
+	  ! ncurrent   2 !   ! \!/  --------      --------      --------
+	  !--------------!   !  `    (hpage|view hypertxt.c 173)                      /!\
+	  ! nodes      3 !   !                                     !
+	  !--------------!   !                                     !
+	  ! ndlen      * !   !_____________________________________!
+      !--------------!
+	  ! hdlen      * !	(FlistHeaderFlistHeader|flexlist.htx)		* depends on data model
+      !--------------!
+	  ! fname, refs  !	(hpages_info|view hypertxt.c 178)
+	  ----------------
+

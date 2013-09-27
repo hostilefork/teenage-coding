@@ -1,0 +1,25 @@
+/*
+ * Archival code written when I was 17, see blog about it:
+ *     http://hostilefork.com/2013/09/27/inquiry-more-teenage-turbo-c-coding/
+ */
+
+
+
+NOTE: This directory contained the various bitmaps for things like arrows,
+the help page, the title screen, etc.
+
+A "PCC file" is really just another name for a PCX file:
+
+    https://en.wikipedia.org/wiki/PCX
+
+Early programs used the PCC extension whenever you saved just part of your
+screen, instead of the entire canvas.  The trailing "C" apparently stood
+for "Cutout".  (This convention was apparently eliminated sometime after
+1993 and all files were just PCX.)
+
+The toolkit I used for dealing with PCX files had the ability to moosh
+together a lot of files into one...and then load the images out that file
+via API calls.  (It was something like a resource file.)  So everything
+in this directory was mooshed with that archiver into something called
+INQG.DAT.  This data file was expected to be in the same path as INQG.EXE
+when you ran it.

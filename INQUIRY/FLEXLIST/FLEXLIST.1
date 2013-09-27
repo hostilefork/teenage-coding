@@ -1,0 +1,745 @@
+          -----------------------------------------------------------
+                                clrFlist
+          -----------------------------------------------------------
+
+          Category       housekeeping
+
+          Function       Removes all nodes from a FlexList.
+
+          Prototype      int  clrFlist (Flist lptr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to clear.
+                         The current node is set as undefined.
+                         Global data for the list is left unchanged.
+
+          Example        Flist myStack;
+                         struct { ??? } myStackItem;
+
+                         {
+                           myStack = mkFlist(sizeof(myStackItem),0);
+                           ...
+                           clrFlist(myStack);
+                           ...
+                         }
+
+
+
+          -----------------------------------------------------------
+                                 curdptr
+          -----------------------------------------------------------
+
+          Category       current
+
+          Function       Return a pointer to the data in the current
+                         node or NULL if there is no node current.
+
+          Prototype      void *curdptr (Flist lptr);
+
+          Remarks        lptr is the FlexList to query.
+
+          Example        see stod()
+
+
+
+          -----------------------------------------------------------
+                                    deld
+          -----------------------------------------------------------
+
+          Category       list
+
+          Function       Delete the current node after copying its
+                         contents to bufAddr.  If  bufAddr is NULL
+                         discard the data with the node.  Make the
+                         previous node current.  If there is no
+                         previous node then set current node as
+                         undefined but report the success of the
+                         deletion.  If there is no current node to
+                         begin with the deletion obviously fails.
+
+          Prototype      int  deld (Flist lptr, void *bufAddr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to operate on.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to copy the data to.  If bufAddr
+                         is NULL no data is copied.
+
+          Example        see insdptr()
+
+
+
+
+          -----------------------------------------------------------
+                                    deln
+          -----------------------------------------------------------
+
+          Category       list
+
+          Function       Unlink the current node from the list and
+                         return a pointer to this dangling node.  Make
+                         the previous node current.  If there is no
+                         previous node then set current node as
+                         undefined but report the success of the
+                         unlinking.  If there is no current node to
+                         begin with the unlinking obviously fails.
+                         A node is said to be dangling when it
+                         momentarily does not belong to any FlexList.
+
+          Prototype      FlistN deln (Flist lptr);
+
+          Returns        pointer to the dangling node or NULL if deln()
+                         fails.
+
+          Remarks        lptr is the FlexList to extract the node from.
+
+          Restrictions   Dangling nodes should only be linked into
+                         compatible FlexLists.  FlexLists are closely
+                         compatible if they both contain the same type
+                         of data.  They are loosely compatible if the
+                         data they contain is of the same length in
+                         bytes.  In the case of loosely compatible
+                         types some form of tag field would need to be
+                         maintained in the data to allow the
+                         application to differentiate between the data
+                         types.
+
+          Example        see insn()
+
+
+
+          -----------------------------------------------------------
+                              Flistdptr
+          -----------------------------------------------------------
+
+          Category       housekeeping
+
+          Function       Return pointer to global data for a list.
+
+          Prototype      void *Flistdptr (Flist lptr);
+
+          Remarks        lptr is the FlexList to inspect.
+
+          Example        see chapter 4, "Global Data for a List"
+
+
+
+
+
+          -----------------------------------------------------------
+                                  getd
+          -----------------------------------------------------------
+
+          Category       list
+
+          Function       Read the contents of the current node.
+
+          Prototype      int getd (Flist lptr, void *bufAddr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to read from.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of item to which the node's contents will be
+                         copied to.
+
+          Example        Flist myList;
+                         int i, j;
+                         {
+                           myList = mkFlist(sizeof(int),0);
+                           for (i=1;i<=10,i++)
+                             iquedptr(myList,&i);
+                           for (i=1;mkcdptr(myList,i);i++)  {
+                             getd(myList,&j);
+                             printf("\n  %d",j);
+                           }
+                           rmFlist(&myList);
+                         }
+
+
+
+
+          -----------------------------------------------------------
+                                 insdptr
+          -----------------------------------------------------------
+
+          Category       list
+
+          Function       Insert new node after current node and copy
+                         the data pointed to by bufAddr to it.  If
+                         bufAddr is NULL then go ahead and insert the
+                         node but don't copy anything to it.  Make the
+                         new node current.  If the current node is
+                         undefined insert the new node at the front of
+                         the list.
+
+          Prototype      void *insdptr (Flist lptr, void *bufAddr);
+
+          Returns        pointer to the data area of the newly
+                         inserted node.  If the function fails then
+                         NULL is returned.
+
+          Remarks        lptr is the FlexList to operate on.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to insert.
+
+          Example        Flist myList;
+                         struct { ??? } myListItem;
+                         {
+                           myList = mkFlist(sizeof(myListItem),0);
+                           myListItem.? = ???;  /* etc. */
+                           insdptr(myList,&myListItem);
+                           ...
+                           deld(myList,&myListItem);
+                           ...
+                         }
+
+
+
+
+          -----------------------------------------------------------
+                                    insn
+          -----------------------------------------------------------
+
+          Category       list
+
+          Function       Insert dangling node after current node.  Make
+                         the inserted node current.  If the current
+                         node is undefined insert the dangling node at
+                         the front of the list.  In this case the front
+                         node of the list becomes current.  A node is
+                         said to be dangling when it momentarily does
+                         not belong to any FlexList.
+
+          Prototype      int insn (Flist lptr, FlistN nptr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to insert the node into.
+                         nptr is a pointer to the dangling node to be
+                         inserted.
+
+          Restrictions   Dangling nodes should only be linked into
+                         compatible FlexLists.  FlexLists are closely
+                         compatible if they both contain the same type
+                         of data.  They are loosely compatible if the
+                         data they contain is of the same length in
+                         bytes.  In the case of loosely compatible
+                         types some form of tag field would need to be
+                         maintained in the data to allow the
+                         application to differentiate between the data
+                         types.
+
+          Example        Flist srcList, dstList;
+                         struct { ??? } ListItem;
+                         {
+                           srcList = mkFlist(sizeof(ListItem),0);
+                           dstList = mkFlist(sizeof(ListItem),0);
+                           ...
+                           if (srcList && dstList)
+                              insn ( dstList, deln ( srcList ) );
+                           ...
+                         }
+
+
+
+
+          -----------------------------------------------------------
+                                 iquedptr
+          -----------------------------------------------------------
+
+          Category       stack and queue
+
+          Function       Insert item into queue.
+
+          Prototype      void *iquedptr (Flist lptr, void *bufAddr);
+
+          Returns        pointer to the data area of the queued node or
+                         NULL if iquedptr() fails.
+
+          Remarks        lptr is the FlexList to queue.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to insert.  If bufAddr is NULL a
+                         new node is still queued but without any data
+                         being copied to it.
+
+          Example        see topdptr()
+
+
+
+
+
+          -----------------------------------------------------------
+                                 iquen
+          -----------------------------------------------------------
+
+          Category       stack and queue
+
+          Function       Insert dangling node into queue.
+
+          Prototype      int iquen (Flist lptr, FlistN nptr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to queue.
+                         nptr is the pointer to the dangling node to
+                         queue which was return by popn() or deln().
+
+          Example        chapter 4, "Pointers to Nodes and Data"
+
+
+
+
+          -----------------------------------------------------------
+                                 mkcdptr
+          -----------------------------------------------------------
+
+          Category       current node
+
+          Function       Make the indicated node current and return a
+                         pointer to this node's data.
+
+          Prototype      void *mkcdptr (Flist lptr, unsigned loc);
+
+          Returns        pointer to current node's data or NULL if it
+                         fails.
+
+          Remarks        lptr is the FlexList to manipulate.
+                         loc is the number of the node to make current.
+                         Nodes are numbered starting at one.
+                         Requesting a current node outside the range of
+                         nodes in the FlexList resets the current node
+                         as undefined.  Mkcdptr() determines which
+                         pointer is closest to the requested node, i.e.
+                         front, current, or rear, and then proceeds to
+                         traverse the necessary links to arrive at the
+                         requested node.  Be sure to read "Current Node
+                         Concept" in chapter 4.  Mkcdptr() is called by
+                         stod() and rcld().
+
+          Example        see putd()
+
+
+
+
+          -----------------------------------------------------------
+                                mkFlist
+          -----------------------------------------------------------
+
+          Category       housekeeping
+
+          Function       Allocates and initializes the FlexList's
+                         control block.
+
+          Prototype      Flist mkFlist (size_t ndsize, size_t hdsize);
+
+          Returns        pointer to the control block or NULL if
+                         mkFlist() fails.
+
+          Remarks        ndsize is the size of the data in bytes that
+                         will be stored in the nodes.  Use sizeof() to
+                         calculate.
+                         hdsize is the size of the data in bytes that
+                         will be stored in the control block.  This is
+                         a FlexList's global data size.
+
+                         Call mkFlist() before using any FlexList
+                         variable to activate it for the size of the
+                         data item that you intend to store.
+
+          Restrictions   A FlexList must not already be activated or
+                         else its control block and any nodes will
+                         never be returned to the heap.
+
+          Example        Flist myList;
+                         struct { ??? } myListItem;
+                         struct { ??? } myListGlobal;
+                         {
+                           myList = mkFlist (
+                             sizeof(myListItem),sizeof(myListGlobal)
+                           );
+                           if (myList)  {
+                              ...
+                              rmFlist(&myList);
+                           }
+                         }
+
+
+
+
+          -----------------------------------------------------------
+                                  ncur
+          -----------------------------------------------------------
+
+          Category       current node
+
+          Function       Return the number of the current nodecurrent.
+
+          Prototype      unsigned  ncur (Flist lptr);
+
+          Remarks        lptr is the FlexList of interest.
+                         If the current node is undefined then zero
+                         is returned.
+
+
+
+
+          -----------------------------------------------------------
+                                  nempty
+          -----------------------------------------------------------
+
+          Category       housekeeping
+
+          Function       Returns the number of nodes in the FlexList
+                         which is also the boolean answer to the
+                         question "is the FlexList not empty?" hence
+                         it name.
+
+          Prototype      unsigned  nempty (Flist lptr);
+
+          Example        while (nempty(myList))  /* clrFlist(myList) */
+                           popd(myList,NULL);
+
+
+
+
+
+          -----------------------------------------------------------
+                                  nextdptr
+          -----------------------------------------------------------
+
+          Category       list
+
+          Function       Make the next node current, read its contents
+                         if bufAddr is not NULL, and return a pointer
+                         to the node's data.
+
+          Prototype      void *nextdptr (Flist lptr, void *bufAddr);
+
+          Remarks        lptr is the FlexList to operate on.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to which the contents of the node
+                         is copied to.  If the address is NULL then
+                         no data is copied.
+
+                         If the formerly current node is undefined
+                         (zero) the first node of the list is made
+                         current and its contents read.  If the
+                         formerly current node is the rear of the list
+                         then the current node is set as undefined and
+                         the function fails.
+
+          Example        Flist myList;
+                         int i;
+                         {
+                           myList = mkFlist(sizeof(int),0);
+                           for (i=1;i<=10;i++)
+                             iquedptr(myList,&i);
+                           while (nextdptr(myList,&i))
+                             printf("\n  %d  ",i);
+                           rmFlist(&myList);
+                         }
+
+
+          -----------------------------------------------------------
+                                 popd
+          -----------------------------------------------------------
+
+          Category       stack and queue
+
+          Function       Pop the top item off the stack - remove the
+                         front item of the queue.
+
+          Prototype      int  popd (Flist lptr, void *bufAddr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to pop.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of where to pop the data to.  If bufAddr is
+                         NULL then the data is discarded with the node.
+
+          Example        see topdptr()
+
+
+
+          -----------------------------------------------------------
+                                 popn
+          -----------------------------------------------------------
+
+          Category       stack and queue
+
+          Function       Pop the top node off the stack - remove the
+                         front node of the queue.
+
+          Prototype      FlistN popn (Flist lptr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to pop.
+
+          Example        iquen(myStack, popn(myStack));
+                         /* rolldown stack */
+
+
+
+          -----------------------------------------------------------
+                                prevdptr
+          -----------------------------------------------------------
+
+          Category       list
+
+          Function       Make the previous node current, read its
+                         contents if bufAddr is not NULL, and return
+                         a pointer to the node's data.
+
+          Prototype      void *prevdptr (Flist lptr, void *bufAddr);
+
+          Remarks        lptr is the FlexList to traverse.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to which the contents of the node
+                         is copied to.  If the address is NULL then
+                         no data is copied.
+                         If the formerly current node is undefined
+                         (zero) the last node of the list is made
+                         current and its contents read.  If the
+                         formerly current node is the front of the list
+                         then the current node is set as undefined and
+                         the primitive fails.
+
+          Example        Flist myList;
+                         int i;
+                         {
+                           myList = mkFlist(sizeof(int),0);
+                           for (i=1;i<=10;i++)
+                             iquedptr(myList,&i);
+                           while (prevdptr(myList,&i))
+                             printf("\n  %d  ",i);
+                           rmFlist(&myList);
+                         }
+
+
+
+          -----------------------------------------------------------
+                                pushdptr
+          -----------------------------------------------------------
+
+          Category       stack and queue
+
+          Function       Push item onto stack.
+
+          Prototype      void pushdptr (Flist lptr, void *bufAddr);
+
+          Returns        pointer to the data in the top node of the
+                         stack or NULL if pushdptr() fails.
+
+          Remarks        lptr is the FlexList to push.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to push.  If bufAddr is NULL a
+                         node is still pushed but no data is copied to
+                         it.
+
+          Example        Flist myStack;
+                         int i;
+                         {
+                           myStack = mkFlist(sizeof(int),0);
+                           for (i=1;i<=10;i++)
+                             pushdptr(myStack,&i);
+                           while (nextdptr(myStack,&i))
+                             printf("\n  %d  ",i);
+                           rmFlist(&myStack);
+                         }
+
+
+
+          -----------------------------------------------------------
+                                 pushn
+          -----------------------------------------------------------
+
+          Category       stack and queue
+
+          Function       Push node onto stack.
+
+          Prototype      int pushn (Flist lptr, FlistN nptr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to push.
+                         nptr is the pointer to the dangling node to
+                         push.
+
+          Example        /* rollup stack */
+                         mkcdptr(myStack, nempty(myStack));
+                         pushn(myStack, deln(myStack));
+
+
+
+
+          -----------------------------------------------------------
+                                putd
+          -----------------------------------------------------------
+
+          Category       list
+
+          Function       Write item to current nodecurrent.
+
+          Prototype      int  putd (Flist lptr, void *bufAddr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to write to.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to write to the current node.
+
+          Example        Flist myList;
+                         int i;
+                         {
+                           myList = mkFlist(sizeof(int),0);
+                           for (i=1;i<=10;i++)
+                             iquedptr(myList,&i);
+                           mkcdptr(myList,7);
+                           if (getd(myList,&i))
+                              printf("\n  %d  ",i);
+                           ...
+                         }
+
+
+
+          -----------------------------------------------------------
+                               rcld
+          -----------------------------------------------------------
+
+          Category       array
+
+          Function       Recall the contents of the indicated node.
+                         The indicated node becomes the new current
+                         node.
+
+          Prototype      int rcld(Flist lptr,void *bufAddr,unsigned loc);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to recall from.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to which the contents of the
+                         indicated node will be copied to.
+                         loc is the number of the target node.
+
+                         Mkcdptr() is called internally with loc as the
+                         requested node.
+
+          Example        see stod()
+
+
+
+          -----------------------------------------------------------
+                                 rmFlist
+          -----------------------------------------------------------
+
+          Category       housekeeping
+
+          Function       Removes all nodes from the FlexList then
+                         deallocates the FlexList control block.
+
+          Prototype      int rmFlist (Flist *lptrAddr);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptrAddr is the address of the FlexListflexlist
+                         variable to deactivate.
+                         Calls clrFlist() internally.
+
+          Example        Flist myList;
+                         struct { ??? } myListItem;
+                         {
+                           myList = mkFlist(sizeof(myListItem),0);
+                           ...
+                           rmFlist(&myList);
+                         }
+
+
+
+
+          -----------------------------------------------------------
+                                  stod
+          -----------------------------------------------------------
+
+          Category       array
+
+          Function       Store the item in the indicated node.  The
+                         indicated node becomes the new current node.
+
+          Prototype      int stod(Flist lptr,void *bufAddr,unsigned loc);
+
+          Returns        boolean value indicating success or failure.
+
+          Remarks        lptr is the FlexList to store data in.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of the item to store in the indicated node.
+                         loc is the number of the target node.
+                         Mkcdptr() is called internally with loc as the
+                         requested node.
+
+          Example        Flist myArray;
+                         int i, *iptr;
+                         {
+                           myArray = mkFlist(sizeof(int),0);
+                           for (i=1;i<=10;i++)
+                             iquedptr(myArray,&i);
+                           if (rcld(myArray,&i,7))
+                              printf("\n  %d  ",i);
+                           i = 4;
+                           stod(myArray,&i,7);
+                           if ((iptr = curdptr(myArray)) != NULL)
+                              printf("\n  %d  ",*iptr);
+                           rmFlist(&myArray);
+                         }
+
+
+
+          -----------------------------------------------------------
+                                topdptr
+          -----------------------------------------------------------
+
+          Category       stack and queue
+
+          Function       Examine the top item of the stack - examine
+                         the front item of the queue.
+
+          Prototype      void *topdptr (Flist lptr, void *bufAddr);
+
+          Returns        pointer to the data in the front node or NULL
+                         if there are no nodes.
+
+          Remarks        lptr is the FlexList to examine.
+                         bufAddr is the untyped parameter called by
+                         reference.  The address passed is the address
+                         of where to copy the data to in order to
+                         examine it.  If bufAddr is NULL then no data
+                         is copied
+
+          Example        Flist myQueue;
+                         int i;
+                         {
+                           myQueue = mkFlist(sizeof(int),0);
+                           for (i=1;i<=10;i++)
+                             iquedptr(myQueue,&i);
+                           while (topdptr(myQueue,&i))  {
+                             printf("\n  %d  ",i);
+                             popd(myQueue,NULL);
+                           }
+                           rmFlist(&myQueue);
+                         }

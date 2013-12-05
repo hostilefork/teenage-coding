@@ -1,0 +1,64 @@
+These are some photos of a Scrabble-like math game that I made in what I
+believe was 5th grade.  I would have been about 10 or 11, and it would
+have thus been around 1985/1986.
+
+	https://raw.github.com/hostilefork/teenage-coding/master/SCRABBLE/scrabble-math-closed-photo.jpg
+
+	https://raw.github.com/hostilefork/teenage-coding/master/SCRABBLE/scrabble-math-open-photo.jpg
+
+	https://raw.github.com/hostilefork/teenage-coding/master/SCRABBLE/scrabble-math-pieces-photo.jpg
+
+The idea of giving people tiles and asking them to produce valid
+equations from them on a Scrabble board is kind of cool, although one
+can reasonably ask how much *fun* such a game can be (even if it were
+designed well).
+
+I had never seen this kind of thing, so I felt very clever of the time.
+Though now that we have the Internet we can see I'm not the only one to have
+pursued the idea.  For instance, there is "Equate" (1996):
+
+    http://boardgamegeek.com/boardgame/2499/equate
+
+There's even TuxMathScrabble (2001), an open source computer game:
+
+    http://en.wikipedia.org/wiki/TuxMathScrabble
+
+You can find more variants if you search the web.  I believe that it
+has more potential to be a "good game" as a computer program, because the
+computer could shuffle the tiles in such a way as to give you a reasonable
+shot at making an equation.  It's something that's a bit hard to really work
+out with tiles selected by chance.
+
+Speaking of which: I've included the distribution of numbers and symbols as a
+file in the project.  I'm not exactly sure if there's a method to the madness
+(such as not including tiles for any of the numbers between 61 and 100).
+Were I to look at a design problem like this today, I'd certainly want to use
+more logic than I was taught to use by that point.
+
+Perhaps the most amusing aspect to this story was what the other kids designed
+to bring in, when the assignment was to make a math game.  Two stuck out in 
+particular...
+
+One was a kid who made flashcards on index cards, and then drew monsters
+on the back.  The cards were laid monster-side-up, and you were to select a
+card and then do the calculation.  If you got it right, you could pick
+another.  It was called KING OF THE MONSTERS and the goal of the game was
+to find the King and answer his question; if you got it right then you won.
+
+(This obviously limits the replay value; because the cards are inked and once
+you know who the king is you can just go straight to that card.)
+
+Yet adding to the hilarity is that all the monsters were just kind of similar
+drawings BUT there was one card that stood out as a little pink ballerina.
+So when we were playing each other's games, the first pick everyone made was
+"I'll take the ballerina".
+
+And surprise: *SHE* was the King of the Monsters!  Answer question, win game.
+
+The other funny one was a kid who was sitting with an inflatable globe on his
+desk.  The teacher gets to him and asks what his game is and he says it's
+called WORLD OF MATH.  She asks how to play it, and he says he'll throw the
+ball to you and ask you a math problem.  He hadn't done anything, basically.
+
+These days I find these ideas to be hilarious.  I feel like I should have
+been doing things like that for the sheer amusement.

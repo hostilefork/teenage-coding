@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="turn.js"></script>
+<style type="text/css">
+body{
+	background:#ccc;
+}
+#stickers{
+	width:920px;
+	height:748px;
+}
+#stickers .turn-page{
+	background-color:#ccc;
+	background-size:100% 100%;
+}
+</style>
+</head>
+<body>
+
+<p>This is a quick hack up of my childhood sticker collection in
+<a href="http://www.turnjs.com/">turn.js</a>.  It was in storage at my
+grandmother's house on Amelia Island, Florida...scanned Fri Nov 29th 2013.
+The stickers themselves can be identified from the copyright dates as
+being around 1983-ish, so I would have been 8-ish at the time these were
+collected.  So the book is 30-ish years old.</p>
+
+<p>You can navigate it with the left and right cursor keys, or by grabbing
+the corner of the pages with the mouse (not a very discoverable feature,
+if you ask me.)</p>
+
+<div id="stickers">
+	<div style="background-image:url(pages/sticker-cover-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-blank-page.jpg);"></div>
+	<div style="background-image:url(pages/sticker-1-front-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-1-back-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-2-front-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-2-back-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-3-front-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-3-back-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-4-front-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-4-back-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-5-front-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-5-back-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-6-front-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-6-back-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-7-front-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-7-back-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-8-front-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-8-back-scan.jpg);"></div>
+	<div style="background-image:url(pages/sticker-blank-page.jpg);"></div>
+</div>
+
+
+<p>I scanned the images at 600 dpi, did some touch-ups using the high
+resolution data, and then archived them as 1600x1200 lossless PNG.  The
+images you see here are much smaller JPEGs, to fit in a web page.  To get
+the idea of the full resolution, imagine a lossless PNG of
+<a href="scans/sticker-5-front-scan.jpg">something like this JPEG</a></p>
+
+<p>One issue that was kind of annoying was how much hair they picked up,
+especially from my dog.  Stickers are kind of gross in that way.  I edited
+that out along with some other non-sticker-damage.  Another issue that 
+was kind of annoying is that the pages weren't actually all the same size.</p>
+
+<p>My major observation is that there's not a lot you can do with them
+besides taxonomize them... put the puffy ones together, put the smelly
+ones together, etc.  These days I would attempt to tell more of a story...
+or do an artistic layout.  But as a medium it wasn't really geared
+toward that, nor presented that way to children.  More like:
+<i>"Collect, consume, purchase."</i></p>
+
+<p>Sometimes whole sheets were given as gifts.  Many stickers were given
+as rewards on well-graded homework assignments, which was annoying in a
+way because you'd have to peel them off the notebook paper and then try
+and get them to stick.  Trading stickers with other kids was; I suppose,
+an economic lesson... a study of relative values of things to different
+people.  I guess that's the only real education involved.</p>
+
+<p>Some notes:</p>
+
+<ul>
+<li>Probably my favorite sticker, if not one of the high ranking ones,
+was the big Donkey Kong one.  He was a quadruple threat: <i>puffy</i>,
+<i>fuzzy</i>, <i>googly-eyed</i>, AND <i>large</i>.  These days I would
+give it two more points that he's carrying a woman with <i>exposed
+cleavage</i> and <i>short dress</i>.</li>
+<li>I swiped the sparkly purple circular unicorn from a store.  Not a
+sticker store, but like...a Brookstone.  It was a single sticker
+sitting out of place next to some random tech item.  I figured (probably
+correctly) that it had just been gotten at a sticker store and lost.
+It found a home in this book.</li>
+<li>"Nuts to You" is kind of a funny thing to put on a sticker for kids.</li>
+<li>The AAA stickers, while they may seem like outliers, were actually
+much better made than many of the rest.  They were supposed to be able
+to withstand weather on cars and such.  I liked them.</li>
+<li>No idea who Jeff is.</li>
+<li>Many of the stickers still smell if you scratch them.  The sheets
+were encased in plastic sleeves, and I didn't scratch them usually for
+fear of damaging them.</li>
+<li>The stack of pancakes always appealed to me, for some reason.</li>
+<li>The strawberry was notable to me for being one of the few
+photographed stickers... most others were cartoons.  Same with the
+pizza, I guess.</li>
+</ul>
+
+<script type="text/javascript">
+
+	$(window).ready(function() {
+		$('#stickers').turn({
+							display: 'double',
+							acceleration: true,
+							gradients: !$.isTouch,
+							elevation:50,
+							when: {
+								turned: function(e, page) {
+									/*console.log('Current view: ', $(this).turn('view'));*/
+								}
+							}
+						});
+	});
+	
+	
+	$(window).bind('keydown', function(e){
+		
+		if (e.keyCode==37)
+			$('#stickers').turn('previous');
+		else if (e.keyCode==39)
+			$('#stickers').turn('next');
+			
+	});
+
+</script>
+
+</body>
+</html>

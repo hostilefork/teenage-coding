@@ -1,0 +1,23 @@
+This is some code that was in the appendix of a paper I'd written
+in high school for a science project.  The title of the paper was
+
+    "Load Balancing on Massively Parallel Networks:
+     A Cellular Automaton Approach"
+
+The original code would draw a 3-D graph of a mesh, where the
+height of each node in the mesh represented the amount of "work"
+that node had been distributed.  The goal was to count the
+number of steps it took to reach equilibrium where each node had
+been "diffused" an equal (or close enough to equal) amount of
+this work.
+
+The code in the appendix only covered the work distribution
+portion, not the drawing of the graph.  So this is incomplete.
+As time permits, I may try and resurrect it so it works.  In
+the meantime, here it is so I can shred the paper (and so you
+can make fun of how they taught high school kids to write C in
+1992!!)
+
+Blog entry about it:
+
+    http://hostilefork.com/2013/12/10/load-balancing-teenage-coding/

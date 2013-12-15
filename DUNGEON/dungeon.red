@@ -473,28 +473,28 @@ do [
 		command: input "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit? "
 
 		offset: none
-		switch/default command [
-			"f" [
+		switch/default first command [
+			#"f" #"F" [
 				either find walls wall-for-direction facing [
 					print "That direction is blocked!"
 				] [
 					offset: offset-for-direction facing
 				]
 			]
-			"b" [
+			#"b" #"B" [
 				either find walls opposite-wall wall-for-direction facing [
 					print "That direction is blocked!"
 				] [
 					offset: offset-for-direction opposite-direction facing
 				]
 			]
-			"l" [
+			#"l" #"L" [
 				facing: direction-after-left facing
 			]
-			"r" [
+			#"r" #"R" [
 				facing: direction-after-right facing
 			]
-			"q" [quit]
+			#"q" #"Q" [quit]
 		] [
 			print "Invalid command."
 		]

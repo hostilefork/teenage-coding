@@ -30,9 +30,7 @@ Red [
 		a direction you were facing could "light up" regions on the
 		screen...a bit like lighting up segments on an LED:
 
-			https://raw.github.com/hostilefork/teenage-coding/master/DUNGEON/dungeon-spec-flat.jpg
-
-			https://raw.github.com/hostilefork/teenage-coding/master/DUNGEON/dungeon-spec-slant.jpg
+			https://raw.github.com/hostilefork/teenage-coding/master/DUNGEON/dungeon-spec.jpg
 
 		But an implementation of the ideas eluded me.  It was a trickier
 		program than I had written at the time, made even trickier because
@@ -83,7 +81,7 @@ map: [
 ; are not high.  So these are hardcoded.
 ;
 display: [
-	screen-size: [14 13]
+	screen-size: [16 13]
 
 	; maximum depth you can see into the distance
 	max-depth: 3
@@ -99,9 +97,9 @@ display: [
 
 	; dimensions of the walls perpindicular to your facing direction
 	flat-dims-for-depth: [
-		[12 11]
+		[14 11]
 		[8 7]
-		[4 3]
+		[6 5]
 	]
 
 	; bounding dimensions of walls parallel to your facing direction
@@ -312,7 +310,7 @@ draw-slant-wall: function [
 	dims: display/slant-dims-for-depth/(depth)
 
 	start-pos: reduce [
-		1 + either z-offset = -1 [inset] [display/screen-size/2 - inset - dims/1]
+		1 + either z-offset = -1 [inset] [display/screen-size/1 - inset - dims/1]
 		(display/screen-size/2 / 2 + 1) - (dims/2 / 2)
 	]
 

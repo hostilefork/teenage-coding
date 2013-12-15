@@ -85,15 +85,6 @@ display: [
 
 	; maximum depth you can see into the distance
 	max-depth: 3
-	check-depth: function [depth [integer!]] [
-		if any [
-			depth < 1
-			depth > display/max-depth
-		] [
-			print ["Unsupported depth:" depth]
-			quit
-		]
-	]
 
 	; dimensions of the walls perpindicular to your facing direction
 	flat-dims-for-depth: [
@@ -107,6 +98,24 @@ display: [
 		[1 13]
 		[3 11]
 		[1 7]
+	]
+]
+display-make-buffer: function [] [
+	empty-line: copy ""
+	loop display/screen-size/1 [append empty-line space]
+
+	buffer: copy []
+	loop display/screen-size/2 [append buffer copy empty-line]
+
+	buffer
+]
+display-check-depth: function [depth [integer!]] [
+	if any [
+		depth < 1
+		depth > display/max-depth
+	] [
+		print ["Unsupported depth:" depth]
+		quit
 	]
 ]
 
@@ -168,7 +177,7 @@ offset-for-direction: function [
 		south [0 1]
 		west [-1 0]
 	] direction [
-		print ["Bad direction:" mold direction] 
+		print ["Bad direction (offset-for-direction):" mold direction] 
 		quit
 	]
 	result
@@ -186,10 +195,43 @@ wall-for-direction: function [
 		south S
 		west W
 	] direction [
-		print ["Bad direction:" mold direction]
+		print ["Bad direction (wall-for-direction):" mold direction]
 		quit
 	]
 	result
+]
+
+
+is-wall-dark: function [
+	{
+		Shading rule is that the wall you see facing north at [1 1] is
+		dark, and that walls alternate being dark and light so that
+		a light and dark wall do not directly abut eachother.  For
+		this rule to be possible, if you look on one side at a wall
+		and then walk around to the other side and look at that same
+		edge, it will be the opposite shading.
+	}
+
+	pos [block!]
+	direction [word!]
+] [
+	switch/default direction [
+		north [
+			either odd? pos/2 [odd? pos/1] [even? pos/1]
+		]
+		south [
+			either odd? pos/2 [odd? pos/1] [even? pos/1]
+		]
+		east [
+			either even? pos/1 [odd? pos/2] [even? pos/2]
+		]
+		west [
+			either even? pos/1 [odd? pos/2] [even? pos/2]
+		]
+	] [
+		print ["Bad direction (is-wall-dark):" mold direction]
+		quit
+	]
 ]
 
 
@@ -204,7 +246,7 @@ opposite-direction: function [
 		south [north]
 		west [east]
 	] direction [
-		print ["Bad direction:" mold direction]
+		print ["Bad direction (opposite direction):" mold direction]
 		quit
 	]
 	first result
@@ -229,7 +271,7 @@ draw-flat-wall: function [
 
 	return: [logic!] "Whether the flat wall fit completely in the display"
 ] [
-	display/check-depth depth
+	display-check-depth depth
 
 	dims: display/flat-dims-for-depth/(depth)
 
@@ -281,7 +323,7 @@ draw-slant-wall: function [
 
 	buffer [block!] "Display buffer to draw into"
 	depth [integer!] "How many steps in the distance the wall is"
-	z-offset [integer!] "-1 for a left wall, and +1 for a right wall"
+	left-wall [logic!] "Are we drawing a left wall?"
 	dark [logic!] "Should the wall be drawn darkly or lightly?"
 ] [
 	display/check-depth depth
@@ -294,12 +336,12 @@ draw-slant-wall: function [
 	dims: display/slant-dims-for-depth/(depth)
 
 	start-pos: reduce [
-		either z-offset = -1 [inset + 1] [display/screen-size/1 - inset]
+		either left-wall [inset + 1] [display/screen-size/1 - inset]
 		(display/screen-size/2 / 2 + 1) - (dims/2 / 2)
 	]
 
 	end-pos: reduce [
-		either z-offset = -1 [start-pos/1 + dims/1 - 1] [start-pos/1 - dims/1 + 1]
+		either left-wall [start-pos/1 + dims/1 - 1] [start-pos/1 - dims/1 + 1]
 		start-pos/2 + dims/2 - 1
 	]
 
@@ -322,24 +364,28 @@ draw-slant-wall: function [
 		] 
 	]
 
-	col-count: either z-offset = -1 [
-		end-pos/1 - start-pos/1 + 1
-	] [
-		start-pos/1 - end-pos/1 + 1
+	count: compose [
+		(either left-wall [
+			end-pos/1 - start-pos/1 + 1
+		] [
+			start-pos/1 - end-pos/1 + 1
+		])
+		(end-pos/2 - start-pos/2 + 1)
 	]
-	row-count: end-pos/2 - start-pos/2 + 1
-	repeat col col-count [
-		repeat row row-count [
+
+	repeat col count/1 [
+		repeat row count/2 [
 			draw-pos: reduce [
-				start-pos/1 - ((col - 1) * z-offset)
+				start-pos/1 + either left-wall [(col - 1)] [-1 * (col - 1)]
 				start-pos/2 + row - 1
 			]
+
 			buffer/(draw-pos/2)/(draw-pos/1): either dark [#"X"] [#"+"]
 		]
 
 		; at each step, we shorten
 		start-pos/2: start-pos/2 + 1
-		row-count: row-count - 2
+		count/2: count/2 - 2
 	]
 ]
 
@@ -354,11 +400,7 @@ render-3d: function [
 	pos [block!] "one-based position into the map grid"
 	facing [word!] "north, south, east, or west"
 ] [
-	empty-line: copy ""
-	loop display/screen-size/1 [append empty-line space]
-
-	buffer: copy []
-	loop display/screen-size/2 [append buffer copy empty-line]
+	buffer: display-make-buffer
 
 	depth: display/max-depth
 	while [depth > 0] [
@@ -374,15 +416,13 @@ render-3d: function [
 			while [all-inside] [
 				scan-pos: copy pos
 
-				depth-offset: offset-for-direction facing
-
 				scan-pos/1: scan-pos/1 + (
-					(depth - 1) * depth-offset/1
+					(depth - 1) * first offset-for-direction facing
 				) + (
 					step * x-offset * step-offset/1
 				)
 				scan-pos/2: scan-pos/2 + (
-					(depth - 1) * depth-offset/2
+					(depth - 1) * second offset-for-direction facing
 				) + (
 					step * x-offset * step-offset/2
 				)
@@ -394,8 +434,9 @@ render-3d: function [
 
 				either scan-walls [
 					if find scan-walls wall-for-direction facing [
-						dark: odd? (depth + pos/1 + pos/2 + x-offset)
-						all-inside: draw-flat-wall buffer depth x-offset dark
+						all-inside: draw-flat-wall buffer depth x-offset (
+							is-wall-dark scan-pos facing
+						)
 					]
 				] [
 					all-inside: false
@@ -418,15 +459,15 @@ render-3d: function [
 					;-- last thing to do at this depth:
 					;-- draw the diagonal walls to the left and right (if applicable)
 
-					foreach z-offset [-1 1] [
-						side: either z-offset = -1 [
+					foreach left-wall reduce [true false] [
+						side: either left-wall [
 							direction-after-left facing
 						] [
 							direction-after-right facing
 						]
+
 						if find scan-walls wall-for-direction side [
-							dark: even? (depth + pos/1 + pos/2)
-							draw-slant-wall buffer depth z-offset dark
+							draw-slant-wall buffer depth left-wall (is-wall-dark scan-pos side)
 						]
 					]
 				

@@ -59,15 +59,15 @@ Red [
 ; GAME MAP
 ;
 ; For ease of editing, the cells are not encoded as bytes, but rather
-; as a grid of entries that can have their (L)eft, (T)op, (B)ottom,
-; and (R)ight walls set.
+; as a grid of entries that can have their (W)est, (N)orth, (S)outh,
+; and (E)ast walls set.
 ;
 map: [
-	[[L T x x] [x T x x] [x T x x] [x T x x] [x T x R]]
-	[[L x x x] [x x B x] [x x x x] [x x B x] [x x x R]]
-	[[L x x x] [x T x R] [L x x x] [x T x x] [x x x R]]
-	[[L x x x] [x x x x] [x x x x] [x x x x] [x x x R]]
-	[[L x B x] [x x B x] [x x B x] [x x B x] [x x B R]]
+	[[W N . .] [. N . .] [. N . .] [. N . .] [. N . E]]
+	[[W . . .] [. . S .] [. . . .] [. . S .] [. . . E]]
+	[[W . . .] [. N . E] [W . . .] [. N . .] [. . . E]]
+	[[W . . .] [. . . .] [. . . .] [. . . .] [. . . E]]
+	[[W . S .] [. . S .] [. . S .] [. . S .] [. . S E]]
 ]
 
 
@@ -181,33 +181,15 @@ wall-for-direction: function [
 	direction [word!] "Direction to translate."
 ] [
 	unless result: select [
-		north T
-		east R
-		south B
-		west L
+		north N
+		east E
+		south S
+		west W
 	] direction [
 		print ["Bad direction:" mold direction]
 		quit
 	]
 	result
-]
-
-
-opposite-wall: function [
-	{Given letter from the cell wall, give opposite (Top=>Bottom, etc.)}
-
-	wall [word!] "Wall to reverse."
-] [
-	unless result: select [
-		T [B]
-		R [L]
-		B [T]
-		L [R]
-	] wall [
-		print ["Bad edge:" mold edge]
-		quit
-	]
-	first result
 ]
 
 
@@ -480,7 +462,7 @@ do [
 				]
 			]
 			#"b" #"B" [
-				either find walls opposite-wall wall-for-direction facing [
+				either find walls wall-for-direction opposite-direction facing [
 					print "That direction is blocked!"
 				] [
 					offset: offset-for-direction opposite-direction facing

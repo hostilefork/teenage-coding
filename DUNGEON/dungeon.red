@@ -225,6 +225,7 @@ draw-flat-wall: function [
 	buffer [block!] "Display buffer to draw into"
 	depth [integer!] "How many steps in the distance the wall is"
 	x-offset [integer!] "Steps off center the wall should be drawn"
+	dark [logic!] "Should the wall be drawn darkly or lightly?"
 
 	return: [logic!] "Whether the flat wall fit completely in the display"
 ] [
@@ -266,7 +267,7 @@ draw-flat-wall: function [
 	repeat col col-count [
 		repeat row row-count [
 			buffer/(start-pos/2 + row - 1)/(start-pos/1 + col - 1): (
-				either even? x-offset [#"X"] [#"+"]
+				either dark [#"X"] [#"+"]
 			)
 		]
 	]
@@ -281,6 +282,7 @@ draw-slant-wall: function [
 	buffer [block!] "Display buffer to draw into"
 	depth [integer!] "How many steps in the distance the wall is"
 	z-offset [integer!] "-1 for a left wall, and +1 for a right wall"
+	dark [logic!] "Should the wall be drawn darkly or lightly?"
 ] [
 	display/check-depth depth
 
@@ -292,42 +294,52 @@ draw-slant-wall: function [
 	dims: display/slant-dims-for-depth/(depth)
 
 	start-pos: reduce [
-		1 + either z-offset = -1 [inset] [display/screen-size/1 - inset - dims/1]
+		either z-offset = -1 [inset + 1] [display/screen-size/1 - inset]
 		(display/screen-size/2 / 2 + 1) - (dims/2 / 2)
 	]
 
 	end-pos: reduce [
-		start-pos/1 + dims/1 - 1
+		either z-offset = -1 [start-pos/1 + dims/1 - 1] [start-pos/1 - dims/1 + 1]
 		start-pos/2 + dims/2 - 1
 	]
 
 	case/all [
-		start-pos/1 < 1 [
+		any [(start-pos/1 < 1) (start-pos/1 > display/screen-size/1)] [
 			print "Slant wall col-start error"
 			quit
 		]
-		end-pos/1 > display/screen-size/1 [
+		any [(end-pos/1 < 1) (end-pos/1 > display/screen-size/1)] [
 			print "Slant wall col-end error"
 			quit
 		]
-		start-pos/2 < 1 [
+		any [(start-pos/2 < 1) (start-pos/2 > display/screen-size/2)] [
 			print "Slant wall row-start error"
 			quit
 		]
-		end-pos/2 > display/screen-size/2 [
+		any [(end-pos/2 < 1) (end-pos/2 > display/screen-size/2)] [
 			print "Slant wall row-end error"
 			quit
 		] 
 	]
 
-	col-count: end-pos/1 - start-pos/1 + 1
+	col-count: either z-offset = -1 [
+		end-pos/1 - start-pos/1 + 1
+	] [
+		start-pos/1 - end-pos/1 + 1
+	]
 	row-count: end-pos/2 - start-pos/2 + 1
 	repeat col col-count [
 		repeat row row-count [
-			buffer/(start-pos/2 + row - 1)/(start-pos/1 + col - 1): (
-				either even? depth [#"X"] [#"+"]
-			)
+			draw-pos: reduce [
+				start-pos/1 - ((col - 1) * z-offset)
+				start-pos/2 + row - 1
+			]
+			buffer/(draw-pos/2)/(draw-pos/1): either dark [#"X"] [#"+"]
 		]
+
+		; at each step, we shorten
+		start-pos/2: start-pos/2 + 1
+		row-count: row-count - 2
 	]
 ]
 
@@ -382,7 +394,8 @@ render-3d: function [
 
 				either scan-walls [
 					if find scan-walls wall-for-direction facing [
-						all-inside: draw-flat-wall buffer depth x-offset
+						dark: odd? (depth + pos/1 + pos/2 + x-offset)
+						all-inside: draw-flat-wall buffer depth x-offset dark
 					]
 				] [
 					all-inside: false
@@ -412,7 +425,8 @@ render-3d: function [
 							direction-after-right facing
 						]
 						if find scan-walls wall-for-direction side [
-							draw-slant-wall buffer depth z-offset
+							dark: even? (depth + pos/1 + pos/2)
+							draw-slant-wall buffer depth z-offset dark
 						]
 					]
 				

@@ -28,9 +28,11 @@ Red [
 
 		I drew diagrams and had ideas of how a position on the map and
 		a direction you were facing could "light up" regions on the
-		screen...a bit like lighting up segments on an LED:
+		screen...a bit like lighting up segments of a digit on an LCD.  
+		I wrote it up as a programming puzzle on the Code Golf 
+		StackExchange:
 
-			https://raw.github.com/hostilefork/teenage-coding/master/DUNGEON/dungeon-spec.jpg
+			http://codegolf.stackexchange.com/questions/15932/
 
 		But an implementation of the ideas eluded me.  It was a trickier
 		program than I had written at the time, made even trickier because
@@ -81,22 +83,22 @@ map: [
 ; are not high.  So these are hardcoded.
 ;
 display: [
-	screen-size: [16 13]
+	screen-size: [16 15]
 
 	; maximum depth you can see into the distance
 	max-depth: 3
 
 	; dimensions of the walls perpindicular to your facing direction
 	flat-dims-for-depth: [
-		[14 11]
+		[14 13]
 		[8 7]
 		[6 5]
 	]
 
 	; bounding dimensions of walls parallel to your facing direction
 	slant-dims-for-depth: [
-		[1 13]
-		[3 11]
+		[1 15]
+		[3 13]
 		[1 7]
 	]
 ]
@@ -109,60 +111,77 @@ display-make-buffer: function [] [
 
 	buffer
 ]
-display-check-depth: function [depth [integer!]] [
-	if any [
-		depth < 1
-		depth > display/max-depth
-	] [
-		print ["Unsupported depth:" depth]
-		quit
-	]
-]
 
 
 ;
-; Unicode characters for triangles (suboptimal, as they span
-; the width of the character space but not the full height
+; Characters for diagonals.  Unicode versions are suboptimal, as
+; they span the width of the character but not the full height
 ; 
 ; see: http://home.comcast.net/~tamivox/dave/boxchar/index.html
 ;
-triangle-char: [
-	bottom: [
-		left: #"\" ;-- #"^(25E3)"
-		right: #"/" ;-- #"^(25E2)"
+diagonal-char: [
+	dark: [
+		left: [
+			top: #"\" ;-- #"^(25E4)"		
+			bottom: #"/" ;-- #"^(25E3)"
+		]
+
+		right: [
+			top: #"/" ;-- #"^(25E5)"
+			bottom: #"\" ;-- #"^(25E2)"
+		]
 	]
-	top: [
-		left: #"\" ;-- #"^(25E4)"
-		right: #"/" ;-- #"^(25E5)"
+
+	light: [
+		left: [
+			top: #"\" ;-- #"^(25E4)"		
+			bottom: #"/" ;-- #"^(25E3)"
+		]
+
+		right: [
+			top: #"/" ;-- #"^(25E5)"
+			bottom: #"\" ;-- #"^(25E2)"
+		]
 	]
 ]
 
 
 ;
-; Unicode character for a solid block
+; Characters for solid blocks
 ;
-solid-char: #"X" ;-- #"^(2588)"
-
-
-direction-after-right: function [
-	{Get the direction you'd facing after turning right.}
-
-	direction [word!] "Direction turned right relative to"
-] [
-	select [north east south west north] direction
+solid-char: [
+	dark: #"X" ;-- #"^(2593)"
+	light: #"+" ;-- #^(2591)"
 ]
 
 
-direction-after-left: function [
-	{Get the direction you'd facing after turning left.}
+add-offset: function [
+	{Adds the members of the offset block to the location}
+
+	location [block!]
+	offset [block!]
+
+	return: [unset!]
+] [
+	location/1: location/1 + offset/1
+	location/2: location/2 + offset/2
+	exit
+]
+
+
+direction-after-turn: function [
+	{Get the direction you'd facing after turning left or right.}
 
 	direction [word!] "Direction turned right relative to"
-] [
-	;-- Two wrongs don't make a right.
-	;-- (but three lefts do... :-P)
+	side [word!] "left or right"
 
-	loop 3 [direction: direction-after-right direction]
-	direction
+	return: [word!]
+] [
+	either side = 'right [
+		select [north east south west north] direction
+	] [
+		select [north west south east north] direction
+	]
 ]
 
 
@@ -170,6 +189,8 @@ offset-for-direction: function [
 	{Offset pair to take one step in this direction on the map.}
 
 	direction [word!] "Direction step would be taken in"
+
+	return: [block!]
 ] [
 	unless result: select [
 		north [0 -1]
@@ -188,6 +209,8 @@ wall-for-direction: function [
 	{Translate a direction into corresponding letter in "cell dialect"}
 
 	direction [word!] "Direction to translate."
+
+	return: [word!]
 ] [
 	unless result: select [
 		north N
@@ -202,7 +225,7 @@ wall-for-direction: function [
 ]
 
 
-is-wall-dark: function [
+shading-for-wall: function [
 	{
 		Shading rule is that the wall you see facing north at [1 1] is
 		dark, and that walls alternate being dark and light so that
@@ -212,26 +235,29 @@ is-wall-dark: function [
 		edge, it will be the opposite shading.
 	}
 
-	pos [block!]
+	location [block!]
 	direction [word!]
+
+	return: [word!]
 ] [
-	switch/default direction [
+	is-dark: switch/default direction [
 		north [
-			either odd? pos/2 [odd? pos/1] [even? pos/1]
+			either odd? location/2 [odd? location/1] [even? location/1]
 		]
 		south [
-			either odd? pos/2 [odd? pos/1] [even? pos/1]
+			either odd? location/2 [odd? location/1] [even? location/1]
 		]
 		east [
-			either even? pos/1 [odd? pos/2] [even? pos/2]
+			either even? location/1 [odd? location/2] [even? location/2]
 		]
 		west [
-			either even? pos/1 [odd? pos/2] [even? pos/2]
+			either even? location/1 [odd? location/2] [even? location/2]
 		]
 	] [
-		print ["Bad direction (is-wall-dark):" mold direction]
+		print ["Bad direction (shading-for-wall):" mold direction]
 		quit
 	]
+	either is-dark ['dark] ['light]
 ]
 
 
@@ -253,6 +279,41 @@ opposite-direction: function [
 ]
 
 
+in-bounds: function [
+	{
+		Given a coordinate pair, limit it inside a certain boundary.
+		Return true if it didn't need to be limited, false if it did.
+	}
+
+	pos [block!]
+	low [block!]
+	high [block!]
+
+	return: [logic!]
+] [
+	all-inside: true
+	case/all [
+		pos/1 < low/1 [
+			pos/1: low/1
+			all-inside: false
+		]
+		pos/1 > high/1 [
+			pos/1: high/1
+			all-inside: false
+		]
+		pos/2 < low/2 [
+			pos/2: low/2
+			all-inside: false
+		]
+		pos/2 > high/2 [
+			pos/2: high/2
+			all-inside: false
+		]
+	]
+	all-inside
+]
+
+
 draw-flat-wall: function [
 	{
 		Will draw a flat wall at the given depth.  The offset is an integer
@@ -267,51 +328,34 @@ draw-flat-wall: function [
 	buffer [block!] "Display buffer to draw into"
 	depth [integer!] "How many steps in the distance the wall is"
 	x-offset [integer!] "Steps off center the wall should be drawn"
-	dark [logic!] "Should the wall be drawn darkly or lightly?"
+	shading [word!] "How should the wall be shaded?"
 
 	return: [logic!] "Whether the flat wall fit completely in the display"
 ] [
-	display-check-depth depth
-
 	dims: display/flat-dims-for-depth/(depth)
 
 	start-pos: reduce [
-		(display/screen-size/1 / 2 + 1) - (dims/1 / 2) + (dims/1 * x-offset)
-		(display/screen-size/2 / 2 + 1) - (dims/2 / 2)
+		1 + (display/screen-size/1 / 2) - (dims/1 / 2) + (dims/1 * x-offset)
+		1 + (display/screen-size/2 / 2) - (dims/2 / 2)
 	]
 	end-pos: reduce [
 		start-pos/1 + dims/1 - 1
 		start-pos/2 + dims/2 - 1
 	]
 
-	all-inside: true
-	case/all [
-		start-pos/1 < 1 [
-			start-pos/1: 1
-			all-inside: false
-		]
-		end-pos/1 > display/screen-size/1 [
-			end-pos/1: display/screen-size/1
-			all-inside: false
-		]
-		start-pos/2 < 1 [
-			start-pos/2: 1
-			all-inside: false
-		]
-		end-pos/2 > display/screen-size/2 [
-			end-pos/2: display/screen-size/2
-			all-inside: false
-		] 
-	]
+	all-inside: either all reduce [
+		in-bounds start-pos [1 1] display/screen-size
+		in-bounds end-pos [1 1] display/screen-size
+	] [true] [false]
 
-	col-count: end-pos/1 - start-pos/1 + 1
-	row-count: end-pos/2 - start-pos/2 + 1
-	repeat col col-count [
-		repeat row row-count [
-			buffer/(start-pos/2 + row - 1)/(start-pos/1 + col - 1): (
-				either dark [#"X"] [#"+"]
-			)
+	pos: copy start-pos
+	while [pos/1 <= end-pos/1] [
+		while [pos/2 <= end-pos/2] [
+			buffer/(pos/2)/(pos/1): solid-char/(shading)
+			pos/2: pos/2 + 1
 		]
+		pos/2: start-pos/2
+		pos/1: pos/1 + 1
 	]
 
 	all-inside
@@ -323,11 +367,11 @@ draw-slant-wall: function [
 
 	buffer [block!] "Display buffer to draw into"
 	depth [integer!] "How many steps in the distance the wall is"
-	left-wall [logic!] "Are we drawing a left wall?"
-	dark [logic!] "Should the wall be drawn darkly or lightly?"
-] [
-	display/check-depth depth
+	side [word!] "Left or right wall?"
+	shading [word!] "How should the wall be shaded?"
 
+	return: [unset!]
+] [
 	inset: 0
 	repeat d (depth - 1) [
 		inset: inset + display/slant-dims-for-depth/(d)/1
@@ -336,57 +380,43 @@ draw-slant-wall: function [
 	dims: display/slant-dims-for-depth/(depth)
 
 	start-pos: reduce [
-		either left-wall [inset + 1] [display/screen-size/1 - inset]
-		(display/screen-size/2 / 2 + 1) - (dims/2 / 2)
+		either side = 'left [inset + 1] [display/screen-size/1 - inset]
+		1 + (display/screen-size/2 / 2) - (dims/2 / 2)
 	]
 
 	end-pos: reduce [
-		either left-wall [start-pos/1 + dims/1 - 1] [start-pos/1 - dims/1 + 1]
+		either side = 'left [start-pos/1 + dims/1 - 1] [start-pos/1 - dims/1 + 1]
 		start-pos/2 + dims/2 - 1
 	]
 
-	case/all [
-		any [(start-pos/1 < 1) (start-pos/1 > display/screen-size/1)] [
-			print "Slant wall col-start error"
-			quit
-		]
-		any [(end-pos/1 < 1) (end-pos/1 > display/screen-size/1)] [
-			print "Slant wall col-end error"
-			quit
-		]
-		any [(start-pos/2 < 1) (start-pos/2 > display/screen-size/2)] [
-			print "Slant wall row-start error"
-			quit
-		]
-		any [(end-pos/2 < 1) (end-pos/2 > display/screen-size/2)] [
-			print "Slant wall row-end error"
-			quit
-		] 
+	unless all [
+		in-bounds start-pos [1 1] display/screen-size
+		in-bounds end-pos [1 1] display/screen-size
+	] [
+		print "Slant wall boundary error."
+		quit
 	]
 
-	count: compose [
-		(either left-wall [
-			end-pos/1 - start-pos/1 + 1
-		] [
-			start-pos/1 - end-pos/1 + 1
-		])
-		(end-pos/2 - start-pos/2 + 1)
-	]
-
-	repeat col count/1 [
-		repeat row count/2 [
-			draw-pos: reduce [
-				start-pos/1 + either left-wall [(col - 1)] [-1 * (col - 1)]
-				start-pos/2 + row - 1
+	pos: copy start-pos
+	while [either side = 'left [pos/1 <= end-pos/1] [pos/1 >= end-pos/1]] [
+		while [pos/2 <= end-pos/2] [
+			buffer/(pos/2)/(pos/1): case [
+				pos/2 = start-pos/2 [diagonal-char/(shading)/(side)/top]
+				pos/2 = end-pos/2 [diagonal-char/(shading)/(side)/bottom]
+				true [solid-char/(shading)]
 			]
-
-			buffer/(draw-pos/2)/(draw-pos/1): either dark [#"X"] [#"+"]
+			pos/2: pos/2 + 1
 		]
 
 		; at each step, we shorten
 		start-pos/2: start-pos/2 + 1
-		count/2: count/2 - 2
+		end-pos/2: end-pos/2 - 1
+
+		pos/2: start-pos/2
+		pos/1: pos/1 + either side = 'left [1] [-1]
 	]
+
+	exit
 ]
 
 
@@ -397,45 +427,54 @@ render-3d: function [
 		blocks and diagonal triangles.
 	}
 
-	pos [block!] "one-based position into the map grid"
+	location [block!] "one-based player coordinate in the map grid"
 	facing [word!] "north, south, east, or west"
+
+	return: [unset!]
 ] [
 	buffer: display-make-buffer
 
 	depth: display/max-depth
 	while [depth > 0] [
 		x-offset: -1
+
+		;-- We draw a line of flat walls at each depth, with a step
+		;-- index of -1 first to go left of center, then 1 to go
+		;-- right of center.  Finally we draw the center wall and slant
+		;-- walls at that depth.  The depths draw from back to front.
+
 		foreach step [-1 1 0] [
 			step-offset: switch step [
-				-1 [offset-for-direction direction-after-left facing]
-				1 [offset-for-direction direction-after-right facing]
+				-1 [offset-for-direction direction-after-turn facing 'left]
+				1 [offset-for-direction direction-after-turn facing 'right]
 				0 [[0 0]]
 			]
 
 			all-inside: true
 			while [all-inside] [
-				scan-pos: copy pos
+				scan-location: copy location
 
-				scan-pos/1: scan-pos/1 + (
+				;-- adjust scan location for depth parallel to facing
+				add-offset scan-location reduce [
 					(depth - 1) * first offset-for-direction facing
-				) + (
-					step * x-offset * step-offset/1
-				)
-				scan-pos/2: scan-pos/2 + (
 					(depth - 1) * second offset-for-direction facing
-				) + (
+				]
+
+				;-- adjust scan location for offset perpindicular to facing
+				add-offset scan-location reduce [
+					step * x-offset * step-offset/1
 					step * x-offset * step-offset/2
-				)
+				]
 
 				scan-walls: none
-				if map/(scan-pos/2) [
-					scan-walls: map/(scan-pos/2)/(scan-pos/1)
+				if map/(scan-location/2) [
+					scan-walls: map/(scan-location/2)/(scan-location/1)
 				]
 
 				either scan-walls [
 					if find scan-walls wall-for-direction facing [
 						all-inside: draw-flat-wall buffer depth x-offset (
-							is-wall-dark scan-pos facing
+							shading-for-wall scan-location facing
 						)
 					]
 				] [
@@ -459,15 +498,12 @@ render-3d: function [
 					;-- last thing to do at this depth:
 					;-- draw the diagonal walls to the left and right (if applicable)
 
-					foreach left-wall reduce [true false] [
-						side: either left-wall [
-							direction-after-left facing
-						] [
-							direction-after-right facing
-						]
-
-						if find scan-walls wall-for-direction side [
-							draw-slant-wall buffer depth left-wall (is-wall-dark scan-pos side)
+					foreach side [left right] [
+						side-direction: direction-after-turn facing side
+						if find scan-walls wall-for-direction side-direction [
+							draw-slant-wall buffer depth side (
+								shading-for-wall scan-location side-direction
+							)
 						]
 					]
 				
@@ -482,6 +518,8 @@ render-3d: function [
 	repeat line display/screen-size/2 [
 		print buffer/(line)
 	]
+
+	exit
 ]
 
 
@@ -490,20 +528,20 @@ render-3d: function [
 ;--
 
 do [
-    facing: 'north
+	facing: 'north
 
-	pos: [1 1]
+	location: [1 1]
 
 	command: none
 
 	while [command <> "q"] [
 		prin newline
 
-		print ["You are at coordinate" mold pos "facing" mold facing]
+		print ["You are at location" mold location "facing" mold facing]
 
-		walls: map/(pos/2)/(pos/1)
+		walls: map/(location/2)/(location/1)
 
-		render-3d pos facing
+		render-3d location facing
 
 		command: input "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit? "
 
@@ -524,10 +562,10 @@ do [
 				]
 			]
 			#"l" #"L" [
-				facing: direction-after-left facing
+				facing: direction-after-turn facing 'left
 			]
 			#"r" #"R" [
-				facing: direction-after-right facing
+				facing: direction-after-turn facing 'right
 			]
 			#"q" #"Q" [quit]
 		] [
@@ -535,8 +573,7 @@ do [
 		]
 
 		if offset [
-			pos/1: pos/1 + offset/1
-			pos/2: pos/2 + offset/2
+			add-offset location offset
 		]
 
 		prin newline

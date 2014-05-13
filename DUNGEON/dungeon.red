@@ -543,7 +543,7 @@ do [
 
 		render-3d location facing
 
-		command: input "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit? "
+		command: ask "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit? "
 
 		offset: none
 		switch/default first command [

@@ -4,7 +4,7 @@ not really have the tools or experience on hand to write it.
 What I wanted to do was to make a 3-D dungeon game which used
 the character graphics mode of the Commodore 64.
 
-I decided as a programming exercise in the new and interesting
-compiled language called "Red" to implement the vision I had.
-Here you can see the designs I'd made, and compare them to
-the finished result using a tool from 2013.
+I decided to make it as a programming exercise in the language Red,
+which I later ported to Ren-C:
+
+  https://github.com/metaeducation/ren-c/

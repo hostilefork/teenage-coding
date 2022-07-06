@@ -514,7 +514,9 @@ while [command <> "q"] [
 
     render-3d location facing
 
-    command: ask "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit? "
+    command: ask "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit?"
+
+    key: uppercase (first command else [continue])
 
     notify-blocked: does [
         print "That direction is blocked!"
@@ -522,7 +524,7 @@ while [command <> "q"] [
     ]
 
     offset: null
-    switch uppercase first command [
+    switch key [
         #F [
             if find walls wall-for-direction facing [
                 notify-blocked

@@ -496,8 +496,17 @@ location: [1 1]
 
 command: null
 
+all [
+    16 = system.version.4  ; webassembly
+    1 = system.version.5  ; ReplPad
+] then [
+    ; has built-in CLEAR-SCREEN
+] else [
+    clear-screen: does []  ; no-op
+]
+
 while [command <> "q"] [
-    print newline
+    clear-screen
 
     print ["You are at location" mold location "facing" mold facing]
 
@@ -507,31 +516,37 @@ while [command <> "q"] [
 
     command: ask "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit? "
 
+    notify-blocked: does [
+        print "That direction is blocked!"
+        wait 2
+    ]
+
     offset: null
-    switch first command [
-        #"f" #"F" [
+    switch uppercase first command [
+        #F [
             if find walls wall-for-direction facing [
-                print "That direction is blocked!"
+                notify-blocked
             ] else [
                 offset: offset-for-direction facing
             ]
         ]
-        #"b" #"B" [
+        #B [
             if find walls wall-for-direction opposite-direction facing [
-                print "That direction is blocked!"
+                notify-blocked
             ] else [
                 offset: offset-for-direction opposite-direction facing
             ]
         ]
-        #"l" #"L" [
+        #L [
             facing: direction-after-turn facing 'left
         ]
-        #"r" #"R" [
+        #R [
             facing: direction-after-turn facing 'right
         ]
-        #"q" #"Q" [break]
+        #Q [break]
     ] else [
         print "Invalid command."
+        wait 2
     ]
 
     if offset [

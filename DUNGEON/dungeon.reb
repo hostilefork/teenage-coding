@@ -1,6 +1,6 @@
 Rebol [
     Title: {Dungeon Construction Set}
-    File: %dungeon.red
+    File: %dungeon.reb
 
     Description: {
         When I was a kid, I was obsessed with the idea of creating a 3D
@@ -29,10 +29,6 @@ Rebol [
         I drew diagrams and had ideas of how a position on the map and
         a direction you were facing could "light up" regions on the
         screen...a bit like lighting up segments of a digit on an LCD.
-        I wrote it up as a programming puzzle on the Code Golf
-        StackExchange:
-
-            http://codegolf.stackexchange.com/questions/15932/
 
         But an implementation of the ideas eluded me.  It was a trickier
         program than I had written at the time, made even trickier because

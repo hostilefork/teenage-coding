@@ -315,10 +315,10 @@ draw-flat-wall: func [
         start-pos.2 + dims.2 - 1
     ]
 
-    all-inside: did all reduce [
-        in-bounds start-pos [1 1] display.screen-size
-        in-bounds end-pos [1 1] display.screen-size
-    ]
+    ; in-bounds mutates position passed in
+    ;
+    let start-inside: in-bounds start-pos [1 1] display.screen-size
+    let end-inside: in-bounds end-pos [1 1] display.screen-size
 
     let pos: copy start-pos
     while [pos.1 <= end-pos.1] [
@@ -330,7 +330,7 @@ draw-flat-wall: func [
         pos.1: pos.1 + 1
     ]
 
-    return all-inside
+    return start-inside and end-inside  ; e.g. "all-inside"
 ]
 
 

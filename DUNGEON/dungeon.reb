@@ -97,11 +97,11 @@ display: [
         [1 7]
     ]
 ]
-display-make-buffer: function [] [
-    empty-line: copy ""
+display-make-buffer: func [] [
+    let empty-line: copy ""
     repeat display.screen-size.1 [append empty-line space]
 
-    buffer: copy []
+    let buffer: copy []
     repeat display.screen-size.2 [append buffer copy empty-line]
 
     return buffer
@@ -223,7 +223,7 @@ shading-for-wall: func [
     location [block!]
     direction [word!]
 ][
-    is-dark: switch direction [
+    let is-dark: switch direction [
         'north [
             either odd? location.2 [odd? location.1] [even? location.1]
         ]
@@ -249,7 +249,7 @@ opposite-direction: func [
     return: [word!]
     direction [word!] "Direction to reverse."
 ][
-    result: select [
+    let result: select [
         north [south]
         east [west]
         south [north]
@@ -347,7 +347,7 @@ draw-slant-wall: func [
         inset: inset + display.slant-dims-for-depth.(d).1
     ]
 
-    dims: display.slant-dims-for-depth.(depth)
+    let dims: display.slant-dims-for-depth.(depth)
 
     let start-pos: reduce [
         either side = 'left [inset + 1] [display.screen-size.1 - inset]
@@ -512,14 +512,14 @@ while [command <> "q"] [
 
     command: ask "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit?"
 
-    key: uppercase (first command else [continue])
+    let key: uppercase (first command else [continue])
 
     notify-blocked: does [
         print "That direction is blocked!"
         wait 2
     ]
 
-    offset: null
+    let offset: null
     switch key [
         #F [
             if find walls wall-for-direction facing [

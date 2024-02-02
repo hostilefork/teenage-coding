@@ -264,7 +264,7 @@ opposite-direction: func [
 in-bounds: func [
     {Given a coordinate pair, limit it inside a certain boundary}
 
-    return: [logic!] "true if it didn't need to be limited, false if it did"
+    return: [logic?] "true if it didn't need to be limited, false if it did"
     pos [block!]
     low [block!]
     high [block!]
@@ -297,7 +297,7 @@ in-bounds: func [
 draw-flat-wall: func [
     {Will draw a flat wall at the given depth}
 
-    return: [logic!] "Whether the flat wall fit completely in the display"
+    return: [logic?] "Whether the flat wall fit completely in the display"
     buffer [block!] "Display buffer to draw into"
     depth [integer!] "How many steps in the distance the wall is"
     x-offset [integer!] "Steps off center the wall should be drawn (- is left)"

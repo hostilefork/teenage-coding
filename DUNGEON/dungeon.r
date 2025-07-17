@@ -1,8 +1,8 @@
 Rebol [
-    Title: {Dungeon Construction Set}
-    File: %dungeon.reb
+    title: "Dungeon Construction Set"
+    file: %dungeon.r
 
-    Description: {
+    description: --[
         When I was a kid, I was obsessed with the idea of creating a 3D
         dungeon game in text graphics on a Commodore 64.  I was
         inspired by the Intellivision game "Advanced Dungeons and
@@ -48,7 +48,7 @@ Rebol [
         Although the Unicode character set is not as ideal for drawing
         what I had in mind as the 8x8 and directly adjacent character
         set on the C-64, it can still get the idea across.
-    }
+    ]--
 ]
 
 
@@ -117,25 +117,25 @@ display-make-buffer: func [] [
 diagonal-char: [
     dark: [
         left: [
-            top: #"\" ;-- #"^(25E4)"
-            bottom: #"/" ;-- #"^(25E3)"
+            top: #"\"  ; #"^(25E4)"
+            bottom: #"/"  ; #"^(25E3)"
         ]
 
         right: [
-            top: #"/" ;-- #"^(25E5)"
-            bottom: #"\" ;-- #"^(25E2)"
+            top: #"/"  ; #"^(25E5)"
+            bottom: #"\"  ; #"^(25E2)"
         ]
     ]
 
     light: [
         left: [
-            top: #"\" ;-- #"^(25E4)"
-            bottom: #"/" ;-- #"^(25E3)"
+            top: #"\"  ; #"^(25E4)"
+            bottom: #"/"  ; #"^(25E3)"
         ]
 
         right: [
-            top: #"/" ;-- #"^(25E5)"
-            bottom: #"\" ;-- #"^(25E2)"
+            top: #"/"  ; #"^(25E5)"
+            bottom: #"\"  ; #"^(25E2)"
         ]
     ]
 ]
@@ -145,13 +145,13 @@ diagonal-char: [
 ; Characters for solid blocks
 ;
 solid-char: [
-    dark: #"X" ;-- #"^(2593)"
-    light: #"+" ;-- #^(2591)"
+    dark: #"X"  ;  #"^(2593)"
+    light: #"+"  ; #^(2591)"
 ]
 
 
 add-offset: func [
-    {Adds the members of the offset block to the location}
+    "Adds the members of the offset block to the location"
 
     location [block!]
     offset [block!]
@@ -162,7 +162,7 @@ add-offset: func [
 
 
 direction-after-turn: func [
-    {Get the direction you'd facing after turning left or right.}
+    "Get the direction you'd facing after turning left or right"
 
     return: [word!]
     direction [word!] "Direction turned right relative to"
@@ -177,7 +177,7 @@ direction-after-turn: func [
 
 
 offset-for-direction: func [
-    {Offset pair to take one step in this direction on the map.}
+    "Offset pair to take one step in this direction on the map"
 
     return: [block!]
     direction [word!] "Direction step would be taken in"
@@ -188,13 +188,13 @@ offset-for-direction: func [
         south [0 1]
         west [-1 0]
     ] direction else [
-        fail ["Bad direction (offset-for-direction):" mold direction]
+        panic ["Bad direction (offset-for-direction):" mold direction]
     ]
 ]
 
 
 wall-for-direction: func [
-    {Translate a direction into corresponding letter in "cell dialect"}
+    "Translate a direction into corresponding letter in 'cell dialect'"
 
     return: [word!]
     direction [word!] "Direction to translate."
@@ -205,7 +205,7 @@ wall-for-direction: func [
         south S
         west W
     ] direction else [
-        fail ["Bad direction (wall-for-direction):" mold direction]
+        panic ["Bad direction (wall-for-direction):" mold direction]
     ]
 ]
 
@@ -217,7 +217,7 @@ wall-for-direction: func [
 ; same edge, it will be the opposite shading.
 
 shading-for-wall: func [
-    {Determine shading color for a wall}
+    "Determine shading color for a wall"
 
     return: [word!]
     location [block!]
@@ -237,14 +237,14 @@ shading-for-wall: func [
             either even? location.1 [odd? location.2] [even? location.2]
         ]
     ] else [
-        fail ["Bad direction (shading-for-wall):" mold direction]
+        panic ["Bad direction (shading-for-wall):" mold direction]
     ]
     return either is-dark ['dark] ['light]
 ]
 
 
 opposite-direction: func [
-    {Reverse the given direction (north=>south, etc.)}
+    "Reverse the given direction (north=>south, etc.)"
 
     return: [word!]
     direction [word!] "Direction to reverse."
@@ -255,21 +255,21 @@ opposite-direction: func [
         south [north]
         west [east]
     ] direction else [
-        fail ["Bad direction (opposite direction):" mold direction]
+        panic ["Bad direction (opposite direction):" mold direction]
     ]
     return first result
 ]
 
 
 in-bounds: func [
-    {Given a coordinate pair, limit it inside a certain boundary}
+    "Given a coordinate pair, limit it inside a certain boundary"
 
-    return: [logic?] "true if it didn't need to be limited, false if it did"
+    return: [logic?] "okay if it didn't need to be limited, null if it did"
     pos [block!]
     low [block!]
     high [block!]
 ][
-    case/all [
+    case:all [
         pos.1 < low.1 [
             pos.1: low.1
         ]
@@ -283,9 +283,9 @@ in-bounds: func [
             pos.2: high.2
         ]
     ] then [
-        return false  ; not all inside if any branch was taken
+        return null  ; not all inside if any branch was taken
     ] else [
-        return true
+        return okay
     ]
 ]
 
@@ -295,7 +295,7 @@ in-bounds: func [
 ; within the screen boundaries.
 ;
 draw-flat-wall: func [
-    {Will draw a flat wall at the given depth}
+    "Will draw a flat wall at the given depth"
 
     return: [logic?] "Whether the flat wall fit completely in the display"
     buffer [block!] "Display buffer to draw into"
@@ -306,8 +306,10 @@ draw-flat-wall: func [
     let dims: display.flat-dims-for-depth.(depth)
 
     let start-pos: reduce [
-        1 + (display.screen-size.1 / 2) - (dims.1 / 2) + (dims.1 * x-offset)
-        1 + (display.screen-size.2 / 2) - (dims.2 / 2)
+        round (
+            1 + (display.screen-size.1 / 2) - (dims.1 / 2) + (dims.1 * x-offset)
+        )
+        round 1 + (display.screen-size.2 / 2) - (dims.2 / 2)
     ]
 
     let end-pos: reduce [
@@ -335,7 +337,7 @@ draw-flat-wall: func [
 
 
 draw-slant-wall: func [
-    {Draw a slanted wall, which is parallel to the viewer's direction facing.}
+    "Draw a slanted wall, which is parallel to the viewer's direction facing"
 
     buffer [block!] "Display buffer to draw into"
     depth [integer!] "How many steps in the distance the wall is"
@@ -343,19 +345,23 @@ draw-slant-wall: func [
     shading [word!] "How should the wall be shaded?"
 ][
     let inset: 0
-    for d (depth - 1) [
+    for 'd (depth - 1) [
         inset: inset + display.slant-dims-for-depth.(d).1
     ]
 
     let dims: display.slant-dims-for-depth.(depth)
 
     let start-pos: reduce [
-        either side = 'left [inset + 1] [display.screen-size.1 - inset]
-        1 + (display.screen-size.2 / 2) - (dims.2 / 2)
+        round either side = 'left [inset + 1] [display.screen-size.1 - inset]
+        round 1 + (display.screen-size.2 / 2) - (dims.2 / 2)
     ]
 
     let end-pos: reduce [
-        either side = 'left [start-pos.1 + dims.1 - 1] [start-pos.1 - dims.1 + 1]
+        either side = 'left [
+            start-pos.1 + dims.1 - 1
+        ][
+            start-pos.1 - dims.1 + 1
+        ]
         start-pos.2 + dims.2 - 1
     ]
 
@@ -363,7 +369,7 @@ draw-slant-wall: func [
         in-bounds start-pos [1 1] display.screen-size
         in-bounds end-pos [1 1] display.screen-size
     ] else [
-        fail "Slant wall boundary error."
+        panic "Slant wall boundary error."
     ]
 
     let pos: copy start-pos
@@ -372,7 +378,7 @@ draw-slant-wall: func [
             buffer.(pos.2).(pos.1): case [
                 pos.2 = start-pos.2 [diagonal-char.(shading).(side).top]
                 pos.2 = end-pos.2 [diagonal-char.(shading).(side).bottom]
-                true [solid-char.(shading)]
+                <else> [solid-char.(shading)]
             ]
             pos.2: pos.2 + 1
         ]
@@ -388,7 +394,7 @@ draw-slant-wall: func [
 
 
 render-3d: func [
-    {Print 14x13 matrix of Unicode characters, approximating C-64 charset}
+    "Print 14x13 matrix of Unicode characters, approximating C-64 charset"
 
     location [block!] "one-based player coordinate in the map grid"
     facing [word!] "north, south, east, or west"
@@ -397,21 +403,21 @@ render-3d: func [
 
     let depth: display.max-depth
     while [depth > 0] [
-        x-offset: -1
+        let x-offset: -1
 
         ; We draw a line of flat walls at each depth, with a step index of -1
         ; first to go left of center, then 1 to go right of center.  Finally we
         ; draw the center wall and slant walls at that depth.  The depths draw
         ; from back to front.
 
-        for-each step [-1 1 0] [
+        for-each 'step [-1 1 0] [
             let step-offset: switch step [
                 -1 [offset-for-direction direction-after-turn facing 'left]
                 1 [offset-for-direction direction-after-turn facing 'right]
                 0 [[0 0]]
             ]
 
-            let all-inside: true
+            let all-inside: okay
             while [all-inside] [
                 let scan-location: copy location
 
@@ -430,8 +436,8 @@ render-3d: func [
                 ]
 
                 let scan-walls: null
-                if map.(scan-location.2) [
-                    scan-walls: map.(scan-location.2).(scan-location.1)
+                if try map.(scan-location.2) [
+                    scan-walls: try map.(scan-location.2).(scan-location.1)
                 ]
 
                 if scan-walls [
@@ -441,7 +447,7 @@ render-3d: func [
                         )
                     ]
                 ] else [
-                    all-inside: false
+                    all-inside: null
                 ]
 
                 if all-inside [
@@ -461,7 +467,7 @@ render-3d: func [
                     ; last thing to do at this depth: draw the diagonal walls
                     ; to the left and right (if applicable)
 
-                    for-each side [left right] [
+                    for-each 'side [left right] [
                         let side-direction: direction-after-turn facing side
                         if find scan-walls wall-for-direction side-direction [
                             draw-slant-wall buffer depth side (
@@ -470,7 +476,7 @@ render-3d: func [
                         ]
                     ]
 
-                    all-inside: false
+                    all-inside: null
                 ]
             ]
         ]
@@ -478,7 +484,7 @@ render-3d: func [
         depth: depth - 1
     ]
 
-    for line display.screen-size.2 [
+    for 'line display.screen-size.2 [
         print buffer.(line)
     ]
 ]
@@ -492,13 +498,13 @@ location: [1 1]
 
 command: null
 
-all [
-    16 = system.version.4  ; webassembly
-    1 = system.version.5  ; ReplPad
-] then [
-    ; has built-in CLEAR-SCREEN
-] else [
-    clear-screen: does []  ; no-op
+/clear-screen: default [  ; clear-screen is built-in to the Web ReplPad
+    does []
+]
+
+notify-blocked: does [
+    print "That direction is blocked!"
+    wait 2
 ]
 
 while [command <> "q"] [
@@ -506,18 +512,13 @@ while [command <> "q"] [
 
     print ["You are at location" mold location "facing" mold facing]
 
-    walls: map.(location.2).(location.1)
+    let walls: map.(location.2).(location.1)
 
     render-3d location facing
 
     command: ask "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit?"
 
     let key: uppercase (first command else [continue])
-
-    notify-blocked: does [
-        print "That direction is blocked!"
-        wait 2
-    ]
 
     let offset: null
     switch key [

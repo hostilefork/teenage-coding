@@ -210,35 +210,30 @@ wall-for-direction: func [
 ]
 
 
-; Shading rule is that the wall you see facing north at [1 1] is dark, and
-; that walls alternate being dark and light so that a light and dark wall do
-; not directly abut eachother.  For this rule to be possible, if you look on
-; one side at a wall and then walk around to the other side and look at that
-; same edge, it will be the opposite shading.
-
+; Shading creates a checkerboard pattern where adjacent walls alternate between
+; dark and light. This ensures visual consistency: if you walk around a wall
+; and view it from the opposite side, it will have the opposite shading.
+;
 shading-for-wall: func [
-    "Determine shading color for a wall"
+    "Determine shading color for a wall using checkerboard pattern"
 
-    return: [word!]
-    location [block!]
-    direction [word!]
+    return: [~(dark light)~]
+    location [block!] "Grid coordinates [x y]"
+    direction [~(north south east west)~] "Wall face we're looking at"
 ][
+    let x: location.1
+    let y: location.2
+
     let is-dark: switch direction [
-        'north [
-            either odd? location.2 [odd? location.1] [even? location.1]
+        'north 'south [  ; horizontal walls
+            either odd? y [odd? x] [even? x] ; Y-parity determines X rule
         ]
-        'south [
-            either odd? location.2 [odd? location.1] [even? location.1]
+        'east 'west [  ; vertical walls
+            either even? x [odd? y] [even? y]  ; X-parity determines Y rule
         ]
-        'east [
-            either even? location.1 [odd? location.2] [even? location.2]
-        ]
-        'west [
-            either even? location.1 [odd? location.2] [even? location.2]
-        ]
-    ] else [
-        panic ["Bad direction (shading-for-wall):" mold direction]
+        panic "unreachable"
     ]
+
     return either is-dark ['dark] ['light]
 ]
 

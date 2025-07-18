@@ -499,7 +499,7 @@ location: [1 1]
 command: null
 
 /clear-screen: default [  ; clear-screen is built-in to the Web ReplPad
-    does []
+    does [print newline]
 ]
 
 notify-blocked: does [
@@ -518,10 +518,13 @@ while [command <> "q"] [
 
     command: ask "[F]orward, [B]ackward, turn [L]eft, turn [R]ight or [Q]uit?"
 
-    let key: uppercase (first command else [continue])
+    let key: try first command
+    if not key [
+        continue
+    ]
 
     let offset: null
-    switch key [
+    switch uppercase key [
         #F [
             if find walls wall-for-direction facing [
                 notify-blocked
@@ -551,6 +554,4 @@ while [command <> "q"] [
     if offset [
         add-offset location offset
     ]
-
-    print newline
 ]

@@ -164,9 +164,9 @@ add-offset: func [
 direction-after-turn: func [
     "Get the direction you'd facing after turning left or right"
 
-    return: [word!]
-    direction [word!] "Direction turned right relative to"
-    side [word!] "left or right"
+    return: [~[north south east west]~]
+    direction [~[north south east west]~] "Direction turned right relative to"
+    side [~[left right]~]
 ][
     return either side = 'right [
         select [north east south west north] direction
@@ -180,15 +180,14 @@ offset-for-direction: func [
     "Offset pair to take one step in this direction on the map"
 
     return: [block!]
-    direction [word!] "Direction step would be taken in"
+    direction [~[north south east west]~] "Direction step would be taken in"
 ][
-    return select [
-        north [0 -1]
-        east [1 0]
-        south [0 1]
-        west [-1 0]
-    ] direction else [
-        panic ["Bad direction (offset-for-direction):" mold direction]
+    return switch direction [
+        'north [[0 -1]]
+        'south [[0 1]]
+        'east [[1 0]]
+        'west [[-1 0]]
+        panic "unreachable"
     ]
 ]
 
@@ -196,16 +195,15 @@ offset-for-direction: func [
 wall-for-direction: func [
     "Translate a direction into corresponding letter in 'cell dialect'"
 
-    return: [word!]
-    direction [word!] "Direction to translate."
+    return: [~[N S E W]~]
+    direction [~[north south east west]~]
 ][
-    return select [
-        north N
-        east E
-        south S
-        west W
-    ] direction else [
-        panic ["Bad direction (wall-for-direction):" mold direction]
+    return switch direction [
+        'north ['N]
+        'south ['S]
+        'east ['E]
+        'west ['W]
+        panic "unreachable"
     ]
 ]
 
@@ -217,9 +215,9 @@ wall-for-direction: func [
 shading-for-wall: func [
     "Determine shading color for a wall using checkerboard pattern"
 
-    return: [~(dark light)~]
+    return: [~[dark light]~]
     location [block!] "Grid coordinates [x y]"
-    direction [~(north south east west)~] "Wall face we're looking at"
+    direction [~[north south east west]~] "Wall face we're looking at"
 ][
     let x: location.1
     let y: location.2
@@ -241,18 +239,16 @@ shading-for-wall: func [
 opposite-direction: func [
     "Reverse the given direction (north=>south, etc.)"
 
-    return: [word!]
-    direction [word!] "Direction to reverse."
+    return: [~[north south east west]~]
+    direction [~[north south east west]~] "Direction to reverse."
 ][
-    let result: select [
-        north [south]
-        east [west]
-        south [north]
-        west [east]
-    ] direction else [
-        panic ["Bad direction (opposite direction):" mold direction]
+    return switch direction [
+        'north ['south]
+        'east ['west]
+        'south ['north]
+        'west ['east]
+        panic "unreachable"
     ]
-    return first result
 ]
 
 
@@ -296,7 +292,7 @@ draw-flat-wall: func [
     buffer [block!] "Display buffer to draw into"
     depth [integer!] "How many steps in the distance the wall is"
     x-offset [integer!] "Steps off center the wall should be drawn (- is left)"
-    shading [word!] "How should the wall be shaded?"
+    shading [~[dark light]~] "How should the wall be shaded?"
 ][
     let dims: display.flat-dims-for-depth.(depth)
 
@@ -336,8 +332,8 @@ draw-slant-wall: func [
 
     buffer [block!] "Display buffer to draw into"
     depth [integer!] "How many steps in the distance the wall is"
-    side [word!] "Left or right wall?"
-    shading [word!] "How should the wall be shaded?"
+    side [~[left right]~] "Which wall"
+    shading [~[dark light]~] "How should the wall be shaded?"
 ][
     let inset: 0
     for 'd (depth - 1) [
@@ -392,7 +388,7 @@ render-3d: func [
     "Print 14x13 matrix of Unicode characters, approximating C-64 charset"
 
     location [block!] "one-based player coordinate in the map grid"
-    facing [word!] "north, south, east, or west"
+    facing [~[north south east west]~]
 ][
     let buffer: display-make-buffer
 
